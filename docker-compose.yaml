@@ -1,0 +1,35 @@
+name: finote-app
+
+services:
+  api:
+    container_name: finote-backend
+    image: finote-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    tty: true
+    logging:
+      driver: "json-file"
+    ports:
+      - "30010:3000"
+    env_file:
+      - .env
+    networks:
+      net:
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      TZ: ${TZ}
+      PORT: ${PORT}
+      DEBUG: ${DEBUG}
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
+      SENTRY_DSN: ${SENTRY_DSN}
+
+networks:
+  net:
+    name: net
