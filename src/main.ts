@@ -8,6 +8,8 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { FastifyConfig } from '@conf/fastify.config';
 import { ResponseInterceptor } from '@core/interceptors/response.interceptor';
 import { ExceptionFilter } from '@core/filters/exception.filter';
+import { ValidationPipe } from '@nestjs/common';
+import { ValidatorConfig } from '@conf/validator.config';
 
 async function bootstrap() {
   const fastifyAdapter = new FastifyAdapter(FastifyConfig);
@@ -18,6 +20,7 @@ async function bootstrap() {
   }
 
   app.enableCors({ origin: '*' });
+  app.useGlobalPipes(new ValidationPipe(ValidatorConfig));
   app.useGlobalFilters(new ExceptionFilter());
   app.useGlobalInterceptors(new ResponseInterceptor());
 
