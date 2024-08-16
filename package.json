@@ -27,6 +27,7 @@
     "@nestjs/platform-fastify": "^10.4.1",
     "@sentry/nestjs": "^8.25.0",
     "@sentry/profiling-node": "^8.25.0",
+    "class-transformer": "^0.5.1",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
     "nestjs-pino": "^4.1.0",

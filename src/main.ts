@@ -6,6 +6,8 @@ import { MainModule } from './main.module';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyConfig } from '@conf/fastify.config';
+import { ResponseInterceptor } from '@core/interceptors/response.interceptor';
+import { ExceptionFilter } from '@core/filters/exception.filter';
 
 async function bootstrap() {
   const fastifyAdapter = new FastifyAdapter(FastifyConfig);
@@ -14,6 +16,10 @@ async function bootstrap() {
   if (EnvConfig.Const().IS_PRODUCTION) {
     app.useLogger(app.get(Logger));
   }
+
+  app.enableCors({ origin: '*' });
+  app.useGlobalFilters(new ExceptionFilter());
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   await app.listen(EnvConfig.Const().PORT);
 }
