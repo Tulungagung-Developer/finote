@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { RouterModule } from '@nestjs/core';
 import { Routes } from '@ctrl/controller.route';
-import { RootModule } from '@ctrl/root.module';
+import { RootModule } from '@ctrl/root/root.module';
 import { JwtModule } from '@nestjs/jwt';
 import { EnvConfig } from '@conf/env.config';
 import { AuthModule } from '@ctrl/auth/auth.module';

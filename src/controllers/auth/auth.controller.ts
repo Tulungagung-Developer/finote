@@ -20,7 +20,6 @@ export class AuthController extends AbstractController {
 
   @Post('login')
   async login(@Body() body: AuthLoginBodyDto): Promise<AuthLoginResDto> {
-    this.logger.log({ body });
     const user = this.mockUsers.find((u) => u.username === body.username);
     if (user && user.password === body.password) {
       if (user.last_session) throw new UnauthorizedException('There was active session');

@@ -4,5 +4,6 @@ import { ValidationException } from '@core/exceptions/validation.exception';
 
 export const ValidatorConfig: ValidationPipeOptions = {
   whitelist: true,
+  transform: true,
   exceptionFactory: (errors: ValidationError[]) => new ValidationException(errors),
 };
