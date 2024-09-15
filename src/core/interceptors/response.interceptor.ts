@@ -3,6 +3,7 @@ import { CallHandler, ExecutionContext, HttpStatus, Injectable, NestInterceptor 
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { instanceToPlain } from 'class-transformer';
 import { map, Observable } from 'rxjs';
+import BaseEntity from '@db/entities/base/base';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -16,16 +17,27 @@ export class ResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data): BaseResponseDto<Record<string, any>> => {
         const response = new BaseResponseDto<Record<string, any>>();
+
         response.success = true;
         response.request_id = req.id;
 
         if (data instanceof BasePaginatedResponseDto) {
-          response.data = data.items.map((item) => instanceToPlain(item, { excludePrefixes: ['__'] }));
+          response.data = data.items.map((item) => {
+            if (item instanceof BaseEntity) {
+              return item.toJSON();
+            }
+          });
+
           response.meta = data.meta;
 
           return response;
         } else {
-          response.data = instanceToPlain(data, { excludePrefixes: ['__'] });
+          if (data instanceof BaseEntity) {
+            response.data = data.toJSON();
+          } else {
+            response.data = instanceToPlain(data);
+          }
+
           return response;
         }
       }),

@@ -1,0 +1,1237 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <title>finote-backend entity specification</title>
+    <meta charset="utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      .bd-aside a {
+        padding: 0.1875rem 0.5rem;
+        margin-top: 0.125rem;
+        margin-left: 0.3125rem;
+        color: var(--bs-body-color);
+      }
+
+      .bd-aside a:hover,
+      .bd-aside a:focus {
+        color: var(--bs-body-color);
+        background-color: rgba(121, 82, 179, 0.1);
+      }
+
+      .bd-aside .active {
+        font-weight: 600;
+        color: var(--bs-body-color);
+      }
+
+      .bd-aside .btn {
+        padding: 0.25rem 0.5rem;
+        font-weight: 600;
+        color: var(--bs-body-color);
+      }
+
+      .bd-aside .btn:hover,
+      .bd-aside .btn:focus {
+        color: var(--bs-body-color);
+        background-color: rgba(121, 82, 179, 0.1);
+      }
+
+      .bd-aside .btn:focus {
+        box-shadow: 0 0 0 1px rgba(121, 82, 179, 0.7);
+      }
+
+      .bd-aside .btn::before {
+        width: 1.25em;
+        line-height: 0;
+        content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ccc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+        transition: transform 0.35s ease;
+
+        /* rtl:raw:
+    transform: rotate(180deg) translateX(-2px);
+    */
+        transform-origin: 0.5em 50%;
+      }
+
+      .bd-aside .btn[aria-expanded="true"]::before {
+        transform: rotate(90deg) /* rtl:ignore */;
+      }
+
+      /* Layout */
+      @media (min-width: 1200px) {
+        html {
+          scroll-padding-top: 4rem;
+        }
+
+        body {
+          display: grid;
+          grid-template-rows: auto;
+          grid-template-columns: 4fr 1fr;
+          gap: 1rem;
+        }
+
+        .bd-header {
+          position: fixed;
+          top: 0;
+          /* rtl:begin:ignore */
+          right: 0;
+          left: 0;
+          /* rtl:end:ignore */
+          z-index: 1030;
+          grid-column: 1 / span 3;
+        }
+
+        .bd-aside,
+        .bd-cheatsheet {
+          padding-top: 4rem;
+        }
+
+        /**
+      * 1. Too bad only Firefox supports subgrids ATM
+      */
+        .bd-cheatsheet,
+        .bd-cheatsheet section,
+        .bd-cheatsheet article {
+          display: inherit; /* 1 */
+          grid-template-rows: auto;
+          grid-template-columns: 4fr;
+          grid-column: 1 / span 2;
+          gap: inherit; /* 1 */
+        }
+
+        .bd-aside {
+          grid-area: 1 / 3;
+          scroll-margin-top: 4rem;
+        }
+
+        .bd-cheatsheet section,
+        .bd-cheatsheet section > h2 {
+          top: 2rem;
+          scroll-margin-top: 2rem;
+        }
+
+        .bd-cheatsheet section > h2::before {
+          position: absolute;
+          /* rtl:begin:ignore */
+          top: 0;
+          right: 0;
+          bottom: -2rem;
+          left: 0;
+          /* rtl:end:ignore */
+          z-index: -1;
+          content: "";
+        }
+
+        .bd-cheatsheet article,
+        .bd-cheatsheet .bd-heading {
+          top: 8rem;
+          scroll-margin-top: 8rem;
+        }
+
+        .bd-cheatsheet .bd-heading {
+          z-index: 1;
+        }
+      }
+
+      .hide {
+        display: none !important;
+      }
+
+      .mermaid-box {
+        height: 60vh;
+        min-height: 600px;
+        width: 85vw;
+      }
+
+      .mermaid {
+        height: 60vh;
+        min-height: 600px;
+        width: 85vw;
+        overflow: hidden;
+
+        svg {
+          height: 100% !important;
+          width: 100% !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-body-tertiary">
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">finote-backend</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarCollapse"
+          aria-controls="navbarCollapse"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Entity</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="mermaid.html">ER Diagram</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <aside
+      class="bd-aside sticky-xl-top text-body-secondary align-self-start mb-3 mb-xl-5 px-2"
+    >
+      <section
+        class="entity-version-toc-section toc-finote-backend-1726406279462"
+      >
+        <h2 class="h6 pt-4 pb-3 mb-4 border-bottom">1726406279462</h2>
+        <nav id="toc-1726406279462" class="small">
+          <ul class="list-unstyled">
+            <li class="my-2">
+              <a
+                class="anchor-link"
+                href="#1726406279462-user-User"
+                aria-label="Link to this section: user(User)"
+              >
+                user
+              </a>
+            </li>
+            <li class="my-2">
+              <a
+                class="anchor-link"
+                href="#1726406279462-user_session-UserSession"
+                aria-label="Link to this section: user_session(UserSession)"
+              >
+                user_session
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </section>
+    </aside>
+
+    <div class="bd-cheatsheet container-fluid bg-body">
+      <section>
+        <select
+          id="entity-version-select"
+          class="form-select form-select-lg mb-3"
+          aria-label="Large select example"
+        >
+          <option value="finote-backend-1726406279462" selected>
+            finote-backend 1726406279462
+          </option>
+        </select>
+      </section>
+
+      <section
+        class="entity-version-content-section content-finote-backend-1726406279462"
+      >
+        <h2>finote-backend 1726406279462</h2>
+        <div class="container-fluid">
+          <div class="container-fluid">
+            <h2 id="1726406279462-user-User" class="title is-3">
+              user <small class="text-body-secondary">(User)</small>
+              <a
+                class="anchor-link"
+                href="#1726406279462-user-User"
+                aria-label="Link to this section: user(User)"
+                >#</a
+              >
+            </h2>
+
+            <div class="container-fluid">
+              <table class="table table-striped table-hover caption-top">
+                <caption>
+                  <i class="bi bi-grid-3x2-gap"></i>
+                  user<small class="text-body-secondary">(User)</small>
+                  columns
+                </caption>
+                <thead>
+                  <tr>
+                    <th>&nbsp;</th>
+                    <!-- changing status -->
+                    <th>Database Name</th>
+                    <th>Property Name</th>
+                    <th>Attribute</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Charset</th>
+                    <th>Comment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user-User-id">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-id"
+                        aria-label="Link to this section: id in user(User)"
+                        >#</a
+                      >
+                      <span>id</span>
+                    </td>
+
+                    <td id="1726406279462-user-User-id">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-id"
+                        aria-label="Link to this section: id in user(User)"
+                        >#</a
+                      >
+                      <span>id</span>
+                    </td>
+
+                    <td>
+                      <span class="badge text-bg-success">PK</span>
+                    </td>
+
+                    <td>
+                      <span>*varchar</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user-User-created_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-created_at"
+                        aria-label="Link to this section: created_at in user(User)"
+                        >#</a
+                      >
+                      <span>created_at</span>
+                    </td>
+
+                    <td id="1726406279462-user-User-created_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-created_at"
+                        aria-label="Link to this section: created_at in user(User)"
+                        >#</a
+                      >
+                      <span>created_at</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*timestamp</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user-User-updated_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-updated_at"
+                        aria-label="Link to this section: updated_at in user(User)"
+                        >#</a
+                      >
+                      <span>updated_at</span>
+                    </td>
+
+                    <td id="1726406279462-user-User-updated_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-updated_at"
+                        aria-label="Link to this section: updated_at in user(User)"
+                        >#</a
+                      >
+                      <span>updated_at</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*timestamp</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user-User-username">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-username"
+                        aria-label="Link to this section: username in user(User)"
+                        >#</a
+                      >
+                      <span>username</span>
+                    </td>
+
+                    <td id="1726406279462-user-User-username">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-username"
+                        aria-label="Link to this section: username in user(User)"
+                        >#</a
+                      >
+                      <span>username</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*varchar(16)</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user-User-password">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-password"
+                        aria-label="Link to this section: password in user(User)"
+                        >#</a
+                      >
+                      <span>password</span>
+                    </td>
+
+                    <td id="1726406279462-user-User-password">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-password"
+                        aria-label="Link to this section: password in user(User)"
+                        >#</a
+                      >
+                      <span>password</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*varchar</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user-User-otp">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-otp"
+                        aria-label="Link to this section: otp in user(User)"
+                        >#</a
+                      >
+                      <span>otp</span>
+                    </td>
+
+                    <td id="1726406279462-user-User-otp">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-otp"
+                        aria-label="Link to this section: otp in user(User)"
+                        >#</a
+                      >
+                      <span>otp</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>varchar(6)</span>
+                    </td>
+
+                    <td>
+                      <span class="badge text-bg-danger">NULLABLE</span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user-User-otp_expires_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-otp_expires_at"
+                        aria-label="Link to this section: otp_expires_at in user(User)"
+                        >#</a
+                      >
+                      <span>otp_expires_at</span>
+                    </td>
+
+                    <td id="1726406279462-user-User-otp_expires_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-otp_expires_at"
+                        aria-label="Link to this section: otp_expires_at in user(User)"
+                        >#</a
+                      >
+                      <span>otp_expires_at</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>timestamp</span>
+                    </td>
+
+                    <td>
+                      <span class="badge text-bg-danger">NULLABLE</span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mx-auto p-2" style="width: 100%"></div>
+
+            <div class="container-fluid">
+              <table class="table table-striped table-hover caption-top">
+                <caption>
+                  <i class="bi bi-key"></i>
+                  user<small class="text-body-secondary">(User)</small>
+                  indices
+                </caption>
+                <thead>
+                  <tr>
+                    <th>&nbsp;</th>
+                    <!-- changing status -->
+                    <th>Database Name</th>
+                    <th>Property Name</th>
+                    <th>Unique</th>
+                    <th>Columns</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td></td>
+
+                    <td
+                      id="1726406279462-user-User-IDX_78a916df40e02a9deb1c4b75ed"
+                    >
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-IDX_78a916df40e02a9deb1c4b75ed"
+                        aria-label="Link to this section: IDX_78a916df40e02a9deb1c4b75ed in user(User)"
+                        >#</a
+                      >
+                      <span>IDX_78a916df40e02a9deb1c4b75ed</span>
+                    </td>
+
+                    <td
+                      id="1726406279462-user-User-IDX_78a916df40e02a9deb1c4b75ed"
+                    >
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-IDX_78a916df40e02a9deb1c4b75ed"
+                        aria-label="Link to this section: IDX_78a916df40e02a9deb1c4b75ed in user(User)"
+                        >#</a
+                      >
+                      <span>IDX_78a916df40e02a9deb1c4b75ed</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <ul style="margin: 0">
+                        <li>username</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td
+                      id="1726406279462-user-User-UQ_78a916df40e02a9deb1c4b75edb"
+                    >
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-UQ_78a916df40e02a9deb1c4b75edb"
+                        aria-label="Link to this section: UQ_78a916df40e02a9deb1c4b75edb in user(User)"
+                        >#</a
+                      >
+                      <span>UQ_78a916df40e02a9deb1c4b75edb</span>
+                    </td>
+
+                    <td
+                      id="1726406279462-user-User-UQ_78a916df40e02a9deb1c4b75edb"
+                    >
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user-User-UQ_78a916df40e02a9deb1c4b75edb"
+                        aria-label="Link to this section: UQ_78a916df40e02a9deb1c4b75edb in user(User)"
+                        >#</a
+                      >
+                      <span>UQ_78a916df40e02a9deb1c4b75edb</span>
+                    </td>
+
+                    <td>
+                      <span class="badge text-bg-warning">Unique</span>
+                    </td>
+
+                    <td>
+                      <ul style="margin: 0">
+                        <li>username</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="mx-auto p-4" style="width: 100%"></div>
+          </div>
+          <div class="container-fluid">
+            <h2 id="1726406279462-user_session-UserSession" class="title is-3">
+              user_session
+              <small class="text-body-secondary">(UserSession)</small>
+              <a
+                class="anchor-link"
+                href="#1726406279462-user_session-UserSession"
+                aria-label="Link to this section: user_session(UserSession)"
+                >#</a
+              >
+            </h2>
+
+            <div class="container-fluid">
+              <table class="table table-striped table-hover caption-top">
+                <caption>
+                  <i class="bi bi-grid-3x2-gap"></i>
+                  user_session<small class="text-body-secondary"
+                    >(UserSession)</small
+                  >
+                  columns
+                </caption>
+                <thead>
+                  <tr>
+                    <th>&nbsp;</th>
+                    <!-- changing status -->
+                    <th>Database Name</th>
+                    <th>Property Name</th>
+                    <th>Attribute</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Charset</th>
+                    <th>Comment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-id">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-id"
+                        aria-label="Link to this section: id in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>id</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-id">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-id"
+                        aria-label="Link to this section: id in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>id</span>
+                    </td>
+
+                    <td>
+                      <span class="badge text-bg-success">PK</span>
+                    </td>
+
+                    <td>
+                      <span>*varchar</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-created_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-created_at"
+                        aria-label="Link to this section: created_at in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>created_at</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-created_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-created_at"
+                        aria-label="Link to this section: created_at in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>created_at</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*timestamp</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-updated_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-updated_at"
+                        aria-label="Link to this section: updated_at in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>updated_at</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-updated_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-updated_at"
+                        aria-label="Link to this section: updated_at in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>updated_at</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*timestamp</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-token">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-token"
+                        aria-label="Link to this section: token in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>token</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-token">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-token"
+                        aria-label="Link to this section: token in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>token</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>varchar</span>
+                    </td>
+
+                    <td>
+                      <span class="badge text-bg-danger">NULLABLE</span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-expires_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-expires_at"
+                        aria-label="Link to this section: expires_at in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>expires_at</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-expires_at">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-expires_at"
+                        aria-label="Link to this section: expires_at in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>expires_at</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>timestamp</span>
+                    </td>
+
+                    <td>
+                      <span class="badge text-bg-danger">NULLABLE</span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-user_agent">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-user_agent"
+                        aria-label="Link to this section: user_agent in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>user_agent</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-user_agent">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-user_agent"
+                        aria-label="Link to this section: user_agent in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>user_agent</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*varchar</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-ip_address">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-ip_address"
+                        aria-label="Link to this section: ip_address in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>ip_address</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-ip_address">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-ip_address"
+                        aria-label="Link to this section: ip_address in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>ip_address</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*varchar</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-last_login">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-last_login"
+                        aria-label="Link to this section: last_login in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>last_login</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-last_login">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-last_login"
+                        aria-label="Link to this section: last_login in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>last_login</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>timestamp</span>
+                    </td>
+
+                    <td>
+                      <span class="badge text-bg-danger">NULLABLE</span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td
+                      id="1726406279462-user_session-UserSession-login_attempts"
+                    >
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-login_attempts"
+                        aria-label="Link to this section: login_attempts in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>login_attempts</span>
+                    </td>
+
+                    <td
+                      id="1726406279462-user_session-UserSession-login_attempts"
+                    >
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-login_attempts"
+                        aria-label="Link to this section: login_attempts in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>login_attempts</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*int</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-is_blocked">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-is_blocked"
+                        aria-label="Link to this section: is_blocked in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>is_blocked</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-is_blocked">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-is_blocked"
+                        aria-label="Link to this section: is_blocked in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>is_blocked</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*boolean</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-is_verified">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-is_verified"
+                        aria-label="Link to this section: is_verified in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>is_verified</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-is_verified">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-is_verified"
+                        aria-label="Link to this section: is_verified in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>is_verified</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span>*boolean</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+
+                    <td id="1726406279462-user_session-UserSession-user_id">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-user_id"
+                        aria-label="Link to this section: user_id in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>user_id</span>
+                    </td>
+
+                    <td id="1726406279462-user_session-UserSession-user_id">
+                      <a
+                        class="anchor-link"
+                        href="#1726406279462-user_session-UserSession-user_id"
+                        aria-label="Link to this section: user_id in user_session(UserSession)"
+                        >#</a
+                      >
+                      <span>user_id</span>
+                    </td>
+
+                    <td>
+                      <span class="badge text-bg-info">FK</span>
+                    </td>
+
+                    <td>
+                      <span>*varchar</span>
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                      <span></span>
+                    </td>
+
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mx-auto p-2" style="width: 100%"></div>
+
+            <div class="container-fluid"></div>
+            <div class="mx-auto p-4" style="width: 100%"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+
+  <script>
+    var so = document.getElementById("entity-version-select");
+
+    so.addEventListener("change", (e) => {
+      var sectionsForContentHide = document.getElementsByClassName(
+        "entity-version-content-section",
+      );
+      [].forEach.call(sectionsForContentHide, (element) => {
+        element.className = element.className
+          .split(" ")
+          .filter((className) => className !== "hide")
+          .concat(["hide"])
+          .join(" ");
+      });
+
+      var sectionsForTocHide = document.getElementsByClassName(
+        "entity-version-toc-section",
+      );
+      [].forEach.call(sectionsForTocHide, (element) => {
+        element.className = element.className
+          .split(" ")
+          .filter((className) => className !== "hide")
+          .concat(["hide"])
+          .join(" ");
+      });
+
+      var sectionsForContentReveal = document.querySelector(
+        ".content-" + e.target.value,
+      );
+      sectionsForContentReveal.className = sectionsForContentReveal.className
+        .split(" ")
+        .filter((className) => className !== "hide")
+        .join(" ");
+
+      var sectionsForTocReveal = document.querySelector(
+        ".toc-" + e.target.value,
+      );
+      sectionsForTocReveal.className = sectionsForTocReveal.className
+        .split(" ")
+        .filter((className) => className !== "hide")
+        .join(" ");
+    });
+  </script>
+</html>

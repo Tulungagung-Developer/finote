@@ -96,6 +96,13 @@ export class EnvConfig {
       IS_DEVELOPMENT: this.get('NODE_ENV').value === 'development',
       IS_PRODUCTION: this.get('NODE_ENV').value === 'production',
       DEBUG: this.get('DEBUG').toBoolean(),
+      DATABASE: {
+        HOST: this.get('DATABASE_HOST').toBeDefined(),
+        PORT: this.get('DATABASE_PORT').toNumber(),
+        USERNAME: this.get('DATABASE_USERNAME').toBeDefined(),
+        PASSWORD: this.get('DATABASE_PASSWORD').toBeDefined(),
+        NAME: this.get('DATABASE_NAME').toBeDefined(),
+      },
     };
   }
 }

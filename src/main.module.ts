@@ -4,6 +4,8 @@ import { CoreModule } from '@core/core.module';
 import { EnvConfig } from '@conf/env.config';
 import { LoggerModule } from 'nestjs-pino';
 import { SentryModule } from '@sentry/nestjs/setup';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DatabaseConfig } from '@conf/database.config';
 
 @Module({})
 class ProductionModule {
@@ -32,7 +34,12 @@ class ProductionModule {
 
 @Global()
 @Module({
-  imports: [ProductionModule.register(), ControllerModule, CoreModule],
+  imports: [
+    ProductionModule.register(),
+    ControllerModule,
+    CoreModule,
+    TypeOrmModule.forRoot({ ...DatabaseConfig, autoLoadEntities: true }),
+  ],
   exports: [CoreModule],
 })
 export class MainModule {}
