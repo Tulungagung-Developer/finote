@@ -5,7 +5,7 @@ import { QueryFilter } from '@core/interceptors/query-filter.interceptor';
 import { QueryPaged } from '@core/interceptors/query-page.interceptor';
 
 export type RequestContext = { paged?: QueryPaged; filter?: QueryFilter };
-export type FastifyRequest = FRequest & { requestContext: RequestContext };
+export type FastifyRequest = FRequest & { requestContext: RequestContext; authInfo: any };
 
 @Injectable()
 export class RequestInterceptor implements NestInterceptor {

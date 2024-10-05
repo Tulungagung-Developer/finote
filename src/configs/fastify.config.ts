@@ -1,6 +1,8 @@
 import { FastifyHttpOptions, RawRequestDefaultExpression } from 'fastify';
 import { uuid } from '@libs/uid/uuid.library';
 import { Logger } from '@nestjs/common';
+import { Signer } from '@fastify/cookie';
+import { EnvConfig } from './env.config';
 
 const logger = new Logger('Fastify');
 
@@ -21,3 +23,5 @@ export const FastifyConfig: FastifyHttpOptions<any> = {
     },
   },
 };
+
+export const FasitfyCookieSigner = new Signer([EnvConfig.get('COOKIE_SECRET').value], 'sha256');

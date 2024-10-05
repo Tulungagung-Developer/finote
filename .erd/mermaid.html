@@ -243,11 +243,13 @@
 erDiagram
 
 "user(User)" {
-  *varchar id    PK    
+  *uuid id    PK    
   *timestamp created_at    
   *timestamp updated_at    
+  *varchar email    
   *varchar(16) username    
   *varchar password    
+  varchar otp_type    
   varchar(6) otp    
   timestamp otp_expires_at    
 }
@@ -255,18 +257,20 @@ erDiagram
 
 
 "user_session(UserSession)" {
-  *varchar id    PK    
+  *uuid id    PK    
   *timestamp created_at    
   *timestamp updated_at    
-  varchar token    
-  timestamp expires_at    
+  *uuid user_id    FK    
+  varchar refresh_token    
+  timestamp refresh_token_expires_at    
   *varchar user_agent    
   *varchar ip_address    
+  *smallint is_blocked    
+  *int attempt    
+  varchar access_token    
+  timestamp access_token_expires_at    
+  *smallint is_verified    
   timestamp last_login    
-  *int login_attempts    
-  *boolean is_blocked    
-  *boolean is_verified    
-  *varchar user_id    FK    
 }
 
 
@@ -296,11 +300,13 @@ erDiagram
 erDiagram
 
 "user(User)" {
-  *varchar id    PK    
+  *uuid id    PK    
   *timestamp created_at    
   *timestamp updated_at    
+  *varchar email    
   *varchar(16) username    
   *varchar password    
+  varchar otp_type    
   varchar(6) otp    
   timestamp otp_expires_at    
 }
@@ -308,18 +314,20 @@ erDiagram
 
 
 "user_session(UserSession)" {
-  *varchar id    PK    
+  *uuid id    PK    
   *timestamp created_at    
   *timestamp updated_at    
-  varchar token    
-  timestamp expires_at    
+  *uuid user_id    FK    
+  varchar refresh_token    
+  timestamp refresh_token_expires_at    
   *varchar user_agent    
   *varchar ip_address    
+  *smallint is_blocked    
+  *int attempt    
+  varchar access_token    
+  timestamp access_token_expires_at    
+  *smallint is_verified    
   timestamp last_login    
-  *int login_attempts    
-  *boolean is_blocked    
-  *boolean is_verified    
-  *varchar user_id    FK    
 }
 
 

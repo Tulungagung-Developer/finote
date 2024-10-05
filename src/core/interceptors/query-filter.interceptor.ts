@@ -4,14 +4,13 @@ import {
   IsDate,
   IsOptional,
   Validate,
-  validate,
   ValidateIf,
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Observable } from 'rxjs';
-import { plainToInstance, Transform } from 'class-transformer';
-import { ValidationException } from '@core/exceptions/validation.exception';
+import { Transform } from 'class-transformer';
+import { plainToInstance } from '@libs/class-transformer/from-plain.transformer';
 
 @ValidatorConstraint({ name: 'isSortUnique', async: false })
 class IsSortUnique implements ValidatorConstraintInterface {
@@ -64,17 +63,12 @@ export class QueryFilterInterceptor implements NestInterceptor {
     const queries = JSON.parse(JSON.stringify(parse.query));
 
     if ('search' in queries || 'sort' in queries || 'start_date' in queries || 'end_date' in queries) {
-      const queryFilter = plainToInstance(QueryFilter, {
+      const queryFilter = await plainToInstance(QueryFilter, {
         search: queries.search,
         sort: queries.sort,
         start_date: queries.start_date,
         end_date: queries.end_date,
       });
-
-      const errors = await validate(queryFilter);
-      if (errors.length) {
-        throw new ValidationException(errors);
-      }
 
       requestContext.filter = queryFilter;
     }

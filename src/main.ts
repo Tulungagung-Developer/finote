@@ -3,7 +3,7 @@ import { EnvConfig } from '@conf/env.config';
 
 import { ExceptionFilter } from '@core/filters/exception.filter';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { FastifyConfig } from '@conf/fastify.config';
+import { FasitfyCookieSigner, FastifyConfig } from '@conf/fastify.config';
 import { Logger } from 'nestjs-pino';
 import { MainModule } from './main.module';
 import { NestFactory } from '@nestjs/core';
@@ -13,6 +13,7 @@ import { RequestInterceptor } from '@core/interceptors/request.interceptor';
 import { ResponseInterceptor } from '@core/interceptors/response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 import { ValidatorConfig } from '@conf/validator.config';
+import { fastifyCookie } from '@fastify/cookie';
 
 async function bootstrap() {
   const fastifyAdapter = new FastifyAdapter(FastifyConfig);
@@ -21,6 +22,8 @@ async function bootstrap() {
   if (EnvConfig.Const().IS_PRODUCTION) {
     app.useLogger(app.get(Logger));
   }
+
+  await app.register(fastifyCookie, { secret: FasitfyCookieSigner });
 
   app.enableCors({ origin: '*' });
   app.useGlobalPipes(new ValidationPipe(ValidatorConfig));

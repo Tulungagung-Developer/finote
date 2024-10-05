@@ -1,10 +1,10 @@
 import * as url from 'node:url';
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { FastifyRequest } from '@core/interceptors/request.interceptor';
-import { IsNumber, IsOptional, Max, Min, validate } from 'class-validator';
+import { IsNumber, IsOptional, Max, Min } from 'class-validator';
 import { Observable } from 'rxjs';
-import { plainToInstance, Transform } from 'class-transformer';
-import { ValidationException } from '@core/exceptions/validation.exception';
+import { Transform } from 'class-transformer';
+import { plainToInstance } from '@libs/class-transformer/from-plain.transformer';
 
 export class QueryPaged {
   @IsOptional()
@@ -31,15 +31,10 @@ export class QueryPageInterceptor implements NestInterceptor {
     const queries = JSON.parse(JSON.stringify(parse.query));
 
     if ('page_size' in queries || 'page' in queries) {
-      const queryPaged = plainToInstance(QueryPaged, {
+      const queryPaged = await plainToInstance(QueryPaged, {
         page_size: queries.page_size || 25,
         page: queries.page || 1,
       });
-
-      const errors = await validate(queryPaged);
-      if (errors.length) {
-        throw new ValidationException(errors);
-      }
 
       requestContext.paged = queryPaged;
     }
