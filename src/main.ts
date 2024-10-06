@@ -35,7 +35,7 @@ async function bootstrap() {
     new ResponseInterceptor(),
   );
 
-  await app.listen(EnvConfig.Const().PORT);
+  await app.listen(EnvConfig.Const().PORT, '0.0.0.0');
 }
 
 void bootstrap();

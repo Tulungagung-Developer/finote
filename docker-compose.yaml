@@ -10,9 +10,9 @@ services:
     restart: unless-stopped
     tty: true
     logging:
-      driver: "json-file"
+      driver: 'json-file'
     ports:
-      - "30010:3000"
+      - '30010:3000'
     env_file:
       - .env
     networks:
@@ -22,7 +22,6 @@ services:
       TZ: ${TZ}
       PORT: ${PORT}
       DEBUG: ${DEBUG}
-      JWT_SECRET: ${JWT_SECRET}
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USER: ${DATABASE_USER}
