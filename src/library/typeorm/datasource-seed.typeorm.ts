@@ -25,6 +25,7 @@ class MakeDataSource {
       logging: EnvConfig.Const().DEBUG,
       logger: TypeOrmLoggerContainer.ForConnection(EnvConfig.Const().DEBUG ? 'all' : []),
       namingStrategy: new NamingStrategy(),
+      ssl: EnvConfig.Const().DATABASE.SSL,
     });
     if (!this._datasource.isInitialized) {
       await this._datasource.initialize();

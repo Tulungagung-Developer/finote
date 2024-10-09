@@ -18,4 +18,5 @@ export const DatabaseConfig: DataSourceOptions = {
   logging: EnvConfig.Const().DEBUG,
   logger: TypeOrmLoggerContainer.ForConnection(EnvConfig.Const().DEBUG ? 'all' : []),
   namingStrategy: new NamingStrategy(),
+  ssl: EnvConfig.Const().DATABASE.SSL,
 };

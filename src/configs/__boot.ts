@@ -11,6 +11,7 @@ MakeEnv.initialize({
     'DATABASE_USERNAME',
     'DATABASE_PASSWORD',
     'DATABASE_NAME',
+    'DATABASE_SSL',
     'MAIL_HOST',
     'MAIL_USERNAME',
     'MAIL_PASSWORD',

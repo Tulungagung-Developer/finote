@@ -102,6 +102,7 @@ export class EnvConfig {
         USERNAME: this.get('DATABASE_USERNAME').toBeDefined(),
         PASSWORD: this.get('DATABASE_PASSWORD').toBeDefined(),
         NAME: this.get('DATABASE_NAME').toBeDefined(),
+        SSL: this.get('DATABASE_SSL').toBoolean(),
       },
     };
   }
