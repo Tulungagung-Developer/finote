@@ -1,0 +1,32 @@
+{
+  "name": "finote-project",
+  "version": "0.0.0-dev",
+  "main": "index.js",
+  "repository": "git@github.com:skyjackerz/finote-project.git",
+  "author": "haloivanid <ivanazis.idn@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "server",
+    "packages/*"
+  ],
+  "scripts": {
+    "server:lint": "yarn --cwd server lint",
+    "server:format": "yarn --cwd server format",
+    "server:build": "yarn --cwd server build",
+    "server:start": "yarn --cwd server start",
+    "server:dev": "yarn --cwd server start:dev",
+    "server:migration-gen": "yarn --cwd server migration:generate",
+    "server:migration-run": "yarn --cwd server migration:run",
+    "server:seed-run": "yarn --cwd server seed:run"
+  },
+  "devDependencies": {
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

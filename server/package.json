@@ -1,5 +1,5 @@
 {
-  "name": "finote-backend",
+  "name": "finote-server",
   "version": "0.0.0-dev",
   "description": "",
   "author": "haloivanid <ivanazis.id@gmail.com>",
@@ -75,8 +75,6 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "commitizen": "^4.3.0",
-    "cz-conventional-changelog": "^3.3.0",
     "erdia": "^3.7.0",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
@@ -115,11 +113,6 @@
       "@libs/(.*)": "<rootDir>/library/$1",
       "@core/(.*)": "<rootDir>/core/$1",
       "@conf/(.*)": "<rootDir>/configs/$1"
-    }
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
     }
   }
 }

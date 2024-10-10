@@ -1,11 +1,11 @@
 name: finote-app
 
 services:
-  api:
-    container_name: finote-backend
-    image: finote-backend:latest
+  server:
+    container_name: finote-server
+    image: finote-server:latest
     build:
-      context: .
+      context: ../server
       dockerfile: Dockerfile
     restart: unless-stopped
     tty: true
@@ -13,8 +13,6 @@ services:
       driver: 'json-file'
     ports:
       - '30010:3000'
-    env_file:
-      - .env
     networks:
       net:
     environment:
@@ -22,13 +20,17 @@ services:
       TZ: ${TZ}
       PORT: ${PORT}
       DEBUG: ${DEBUG}
+      COOKIE_SECRET: ${COOKIE_SECRET}
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_SSL: ${DATABASE_SSL}
       SENTRY_DSN: ${SENTRY_DSN}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
 
 networks:
   net:
