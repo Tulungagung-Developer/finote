@@ -3,7 +3,7 @@ import { MakeSentry } from '@conf/sentry.config';
 
 MakeEnv.initialize({
   ensureKeys: [
-    'PORT',
+    'SERVER_PORT',
     'DEBUG',
     'COOKIE_SECRET',
     'DATABASE_HOST',

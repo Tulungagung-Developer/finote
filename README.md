@@ -1,4 +1,4 @@
-# Finote Backend
+# Finote
 
 ## Table of Contents
 
@@ -9,11 +9,13 @@
 
 ## Introduction
 
-Welcome to the Finote Backend repository! This project serves as the backend for the Finote application, providing the necessary functionality to support financial note-taking and organization. This README file will guide you through the installation, usage, and other important details of the Finote Backend.
+Welcome to the Finote repository! This project providing the necessary functionality to support financial note-taking and organization. This README file will guide you through the installation, usage, and other important details of the Finote Project.
 
 ## Overview
 
-The Finote Backend uses NestJS, a powerful and efficient Node.js framework for building scalable and maintainable server-side applications. It provides a RESTful API that allows the Finote front end to communicate with the backend and perform CRUD operations.
+This project is a monorepo project that consists of two main components: the Frontend and the Backend. The Frontend is responsible for providing a user-friendly interface for users to create, view, and manage their financial notes. The Backend is responsible for handling data storage, retrieval, and processing.
+
+The Backend uses NestJS, a powerful and efficient Node.js framework for building scalable and maintainable server-side applications. It provides a RESTful API that allows the Finote front end to communicate with the backend and perform CRUD operations.
 
 For the database, we are using PostgreSQL, a powerful open-source relational database management system. It is known for its reliability, scalability, and advanced features. To communicate with the database, we use [TypeORM](https://typeorm.io/data-source#what-is-datasource), a popular Object-Relational Mapping (ORM) library for TypeScript and JavaScript. It simplifies database operations and provides a more intuitive and type-safe way to interact with the database.
 
@@ -26,37 +28,45 @@ Before you can run the Finote Backend, make sure you have the following prerequi
 3. PostgreSQL (version 15.0 or higher)
 4. Email service (e.g., SendGrid, Mailgun, etc.) for sending account verification emails. Or for testing, you can use [Mailtrap](https://mailtrap.io/)
 5. Docker (optional, for running the project in a containerized environment)
+6. A Sentry account (optional, for error tracking and monitoring)
 
 ## Installation
 
-Before proceeding, we assume you have a PostgreSQL database set up and running with a new empty database.
+Before proceeding, we assume you have a PostgreSQL database set up and running with a new empty database. Than, clone the repo (if you wan't contribute better use fork).
 
-### Local
+```bash
+git clone https://github.com/skyjackerz/finote-project.git
+cd finote-project
+```
 
-Follow these steps to install and run the Finote Backend:
+After clone please follow bellow instruction.
 
-1. Clone the repository.
-2. Install dependencies using:
-   ```bash
-   yarn install
-   ```
-3. Generate a random string to create a cookie secret. Here, we will use the `openssl` command:
+### Environment Variables
+
+1. Create a `.env` file in the root directory
+2. Generate a random string to create a cookie secret. Here, we will use the `openssl` command:
 
    ```bash
    openssl rand -hex 64 | tr -d "\n"
    ```
 
-4. Create a `.env` file in the root directory of the project and add the following environment variables:
+   And paste the result to `.env` file as `COOKIE_SECRET`
+
+3. Fill in the `.env` file with the following variables:
 
    ```env
    TZ=UTC
    NODE_ENV=development # development or production
-   DEBUG=false # true or false
-   PORT=3000
+   DEBUG=true
 
    COOKIE_SECRET=your_generated_cookie_secret
 
-   SENTRY_DSN=your_sentry_dsn # optional
+   SERVER_PORT=3000
+   SERVER_SENTRY_DSN=your_server_sentry_dsn # optional
+
+   CLIENT_PORT=3001
+   CLIENT_SENTRY_DSN=your_client_sentry_dsn # optional
+
 
    DATABASE_HOST=your_database_host
    DATABASE_PORT=your_database_port
@@ -69,37 +79,24 @@ Follow these steps to install and run the Finote Backend:
    MAIL_PASSWORD=your_mail_service_password
    ```
 
-5. Run the database migrations using:
+### Build & Deploy
+
+1. Install dependencies:
 
    ```bash
-   yarn migration:run && yarn seed:run
+   yarn install
    ```
 
-6. To run the server:
+2. Database Migraion:
 
    ```bash
-   yarn start
+   yarn server:migration-run
+   yarn server:seed-run
    ```
 
-### Production
-
-We assume that you've been successful with the [Local](#local) section. So we can start to deploy it as the production environment. Follow this step to deploy the Finote Backend:
-
-1. Create a `.env.production` file in the root directory of the project and change the following environment variables:
-   ```env
-   NODE_ENV=production
-   DEBUG=false
-   SENTRY_DSN=your_sentry_dsn # optional
-   ```
-   ⚠️ **Note:** You can change the `DEBUG` variable to `true` if you want to see the debug logs. Also, you can regenerate the `COOKIE_SECRET` variable to make it different from the development environment. Sentry is optional, but it's recommended to use it to catch the errors and exceptions.
-2. Run docker build command:
+3. Deploying:
    ```bash
-   docker buildx build -f Dockerfile -t finote-backend:latest .
-   ```
-3. Run docker compose command:
-
-   ```bash
-   docker compose --env-file .env -f docker-composer.yaml up -d
+   docker compose --env-file .env -f .docker/docker-compose.yml up --build -d
    ```
 
 ## Contribute
@@ -107,15 +104,16 @@ We assume that you've been successful with the [Local](#local) section. So we ca
 If you'd like to contribute to the Finote Backend, please follow these guidelines:
 
 1. Fork the repository. (please read: [About Fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks))
-2. Create a new branch for your feature or bug fix.
-3. Ensure code quality with linters and formatters.
-4. Make your changes and commit them with clear and concise messages, or better, use:
+2. Better to use (git sparse-checkout)[https://git-scm.com/docs/sparse-checkout] for minimize your project data.
+3. Create a new branch for your feature or bug fix.
+4. Ensure code quality with linters and formatters.
+5. Make your changes and commit them with clear and concise messages, or better, use:
    ```bash
    yarn cz
    ```
-5. Push your changes to your forked repository.
-6. Submit a pull request to the main repository and explain clearly what you've done.
-7. For beginners, look for issues with the `(good first issue)` tag or check the projects tab.
-8. Thank you for your contribution!
+6. Push your changes to your forked repository.
+7. Submit a pull request to the main repository and explain clearly what you've done.
+8. For beginners, look for issues with the `(good first issue)` tag or check the projects tab.
+9. Thank you for your contribution!
 
 If you found some issues or have suggestions, please open an issue on the GitHub repository. Before, ensure that your topic isn't duplicated.

@@ -92,7 +92,7 @@ export class EnvConfig {
 
   static Const() {
     return {
-      PORT: this.get('PORT').toNumber(),
+      PORT: this.get('SERVER_PORT').toNumber(),
       IS_DEVELOPMENT: this.get('NODE_ENV').value === 'development',
       IS_PRODUCTION: this.get('NODE_ENV').value === 'production',
       DEBUG: this.get('DEBUG').toBoolean(),

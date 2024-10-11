@@ -19,7 +19,7 @@ class ProductionModule {
     if (EnvConfig.Const().IS_PRODUCTION) {
       module.imports.push(LoggerModule.forRoot());
 
-      if (EnvConfig.get('SENTRY_DSN').value) {
+      if (EnvConfig.get('SERVER_SENTRY_DSN').value) {
         module.imports.push(SentryModule.forRoot());
       }
 
