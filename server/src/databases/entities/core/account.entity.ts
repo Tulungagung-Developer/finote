@@ -1,7 +1,7 @@
 import { CoreEntity } from '@db/entities/base/core';
 import BaseEntity from '@db/entities/base/base';
 import { AmountColumn, ForeignColumn, StringColumn } from '@libs/typeorm/column-decorator.typeorm';
-import { Index, ManyToOne, VersionColumn } from 'typeorm';
+import { Check, Index, ManyToOne, VersionColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { User } from '@db/entities/core/user.entity';
 import { Currencies } from '@db/constants/currencies.const';
@@ -12,6 +12,7 @@ export enum AccountType {
   EWALLET = 'ewallet',
 }
 
+@Check('"balance" >= "minimum_balance"')
 @CoreEntity()
 export class Account extends BaseEntity {
   static readonly searchable: (keyof Account)[] = ['name', 'reference'];

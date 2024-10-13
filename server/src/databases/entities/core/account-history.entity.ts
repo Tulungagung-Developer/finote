@@ -7,6 +7,9 @@ import { Account } from '@db/entities/core/account.entity';
 
 export enum AccountHistoryAction {
   OTHER = 'OTHER',
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
 }
 
 @CoreEntity()
