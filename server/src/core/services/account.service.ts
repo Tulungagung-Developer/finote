@@ -4,6 +4,7 @@ import { RequestContext } from '@core/interceptors/request.interceptor';
 import { AccountHistory, AccountHistoryAction } from '@db/entities/core/account-history.entity';
 import { Account } from '@db/entities/core/account.entity';
 import { User } from '@db/entities/core/user.entity';
+import { DecimalNumber } from '@libs/helpers/decimal.helper';
 import { CreateResponseByContext } from '@libs/helpers/query-context.helper';
 import { DataConnector } from '@libs/typeorm/data-connector.typeorm';
 import { DataSource } from '@libs/typeorm/datasource.typeorm';
@@ -55,8 +56,8 @@ export class AccountService {
       account.user_id = user.id;
       account.name = dto.name;
       account.reference = dto.reference;
-      account.balance = dto.initial_balance;
-      account.minimum_balance = dto.minimum_balance;
+      account.balance = new DecimalNumber(dto.initial_balance);
+      account.minimum_balance = new DecimalNumber(dto.minimum_balance);
       account.type = dto.type;
       account.currency = dto.currency;
 
@@ -66,7 +67,7 @@ export class AccountService {
       log.account_id = account.id;
       log.action = AccountHistoryAction.OTHER;
       log.description = `Initially account: ${account.name}${account.reference ? ` - ${account.reference}` : ''}`;
-      log.pre_balance = 0;
+      log.pre_balance = new DecimalNumber(0);
       log.post_balance = account.balance;
 
       await connector.getRepository(AccountHistory).save(log);
@@ -84,13 +85,15 @@ export class AccountService {
       if (!account) throw new NotFoundException();
       const pre_balance = account.balance;
 
-      if (Number(dto.minimum_balance) >= 0 && Number(dto.minimum_balance) > account.balance) {
+      if (new DecimalNumber(dto.minimum_balance).gte(account.balance)) {
         throw new BadRequestException('Can not set minimum balance more than account balance');
       }
 
       account.name = !dto.name ? account.name : dto.name;
       account.reference = !dto.reference ? account.reference : dto.reference;
-      account.minimum_balance = !dto.minimum_balance ? account.minimum_balance : dto.minimum_balance;
+      account.minimum_balance = !dto.minimum_balance
+        ? new DecimalNumber(account.minimum_balance)
+        : new DecimalNumber(dto.minimum_balance);
 
       await connector.getRepository(Account).save(account, { reload: true });
 

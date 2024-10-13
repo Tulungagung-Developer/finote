@@ -2,9 +2,10 @@ import { CoreEntity } from '@db/entities/base/core';
 import BaseEntity from '@db/entities/base/base';
 import { AmountColumn, ForeignColumn, StringColumn } from '@libs/typeorm/column-decorator.typeorm';
 import { Check, Index, ManyToOne, VersionColumn } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import { User } from '@db/entities/core/user.entity';
 import { Currencies } from '@db/constants/currencies.const';
+import { DecimalNumber } from '@libs/helpers/decimal.helper';
 
 export enum AccountType {
   CASH = 'cash',
@@ -39,11 +40,13 @@ export class Account extends BaseEntity {
   @StringColumn({ nullable: true, length: 50 })
   reference: string;
 
+  @Transform(({ value }) => value.toFixed(2))
   @AmountColumn()
-  balance: number;
+  balance: DecimalNumber;
 
+  @Transform(({ value }) => value.toFixed(2))
   @AmountColumn()
-  minimum_balance: number;
+  minimum_balance: DecimalNumber;
 
   @VersionColumn()
   version: number;

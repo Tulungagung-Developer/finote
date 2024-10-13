@@ -2,8 +2,9 @@ import { CoreEntity } from '@db/entities/base/core';
 import BaseEntity from '@db/entities/base/base';
 import { AmountColumn, ForeignColumn, StringColumn } from '@libs/typeorm/column-decorator.typeorm';
 import { Index, ManyToOne } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import { Account } from '@db/entities/core/account.entity';
+import Decimal from 'decimal.js';
 
 export enum AccountHistoryAction {
   OTHER = 'OTHER',
@@ -32,9 +33,11 @@ export class AccountHistory extends BaseEntity {
   @StringColumn({ nullable: false })
   description: string;
 
+  @Transform((v) => v.toString())
   @AmountColumn({ nullable: false })
-  pre_balance: number;
+  pre_balance: Decimal;
 
+  @Transform((v) => v.toString())
   @AmountColumn({ nullable: false })
-  post_balance: number;
+  post_balance: Decimal;
 }

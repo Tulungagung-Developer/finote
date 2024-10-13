@@ -60,7 +60,10 @@ export async function CreateResponseByContext<T extends BaseEntity>(
   onQueryFilterDateRange(query, context.filter?.start_date, context.filter?.end_date);
 
   const totalData = await query.getCount();
-  const items = await query.skip((context.paged?.page_size || 25) * (context.paged?.page || 1) - 1).getMany();
+  const items = await query
+    .skip((context.paged?.page_size || 25) * ((context.paged?.page || 1) - 1))
+    .take(context.paged?.page_size || 25)
+    .getMany();
 
   const response = new BasePaginatedResponseDto<T>();
 

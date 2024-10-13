@@ -1,7 +1,7 @@
 import { Currencies } from '@db/constants/currencies.const';
 import { AccountType } from '@db/entities/core/account.entity';
 import { IsMoreThan } from '@libs/class-validator/more-than.decorator';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { IsDecimal, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class AccountCreateReqDto {
   @IsEnum(AccountType)
@@ -20,16 +20,14 @@ export class AccountCreateReqDto {
   @IsOptional()
   reference: string;
 
-  @IsNumber()
-  @Min(0)
+  @IsDecimal()
   @IsNotEmpty()
-  minimum_balance: number;
+  minimum_balance: string;
 
-  @IsNumber()
-  @Min(0)
+  @IsDecimal()
   @IsNotEmpty()
   @IsMoreThan('minimum_balance')
-  initial_balance: number;
+  initial_balance: string;
 }
 
 export class AccountUpdateReqDto {
@@ -45,8 +43,7 @@ export class AccountUpdateReqDto {
   @IsOptional()
   reference: string;
 
-  @IsNumber()
-  @Min(0)
+  @IsDecimal()
   @IsOptional()
-  minimum_balance: number;
+  minimum_balance: string;
 }
