@@ -25,8 +25,8 @@ export class GuardService extends PassportStrategy(Strategy) {
             access_token: token,
             is_blocked: false,
             is_verified: true,
-            access_token_expires_at: MoreThan(time()),
-            refresh_token_expires_at: MoreThan(time()),
+            access_token_expires_at: MoreThan(time().toDate()),
+            refresh_token_expires_at: MoreThan(time().toDate()),
           },
         });
 

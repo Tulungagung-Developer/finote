@@ -36,3 +36,17 @@ export function NumberColumn(options?: ColumnOptions): PropertyDecorator {
 export function JsonColumn(options?: ColumnOptions): PropertyDecorator {
   return Column(deepmerge({ type: 'jsonb' }, options || {}));
 }
+
+export function AmmountColumn(options?: ColumnOptions): PropertyDecorator {
+  const columnOptions = deepmerge({ type: 'numeric', precision: 10, scale: 2 }, options || {});
+  columnOptions.transformer = {
+    to(value) {
+      return value;
+    },
+
+    from(value) {
+      return Number(value);
+    },
+  };
+  return Column(columnOptions);
+}

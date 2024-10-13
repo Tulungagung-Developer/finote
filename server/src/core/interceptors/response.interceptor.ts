@@ -21,25 +21,16 @@ export class ResponseInterceptor implements NestInterceptor {
         response.success = true;
         response.request_id = req.id;
 
+        const toPlain = (data: any) => (data instanceof BaseEntity ? data.toJSON() : instanceToPlain(data));
+
         if (data instanceof BasePaginatedResponseDto) {
-          response.data = data.items.map((item) => {
-            if (item instanceof BaseEntity) {
-              return item.toJSON();
-            }
-          });
-
+          response.data = data.items.map((item) => toPlain(item));
           response.meta = data.meta;
-
-          return response;
-        } else {
-          if (data instanceof BaseEntity) {
-            response.data = data.toJSON();
-          } else {
-            response.data = instanceToPlain(data);
-          }
-
           return response;
         }
+
+        response.data = toPlain(data);
+        return response;
       }),
     );
   }

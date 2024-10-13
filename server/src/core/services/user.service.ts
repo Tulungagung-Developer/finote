@@ -115,7 +115,7 @@ export class UserService {
     if (!session) throw new NotFoundException();
 
     const user = await manager.getRepository(User).findOne({
-      where: { id: session.user_id, otp: dto.code, otp_expires_at: MoreThan(time()) },
+      where: { id: session.user_id, otp: dto.code, otp_expires_at: MoreThan(time().toDate()) },
       lock: { mode: 'pessimistic_write_or_fail' },
     });
 
@@ -124,7 +124,7 @@ export class UserService {
     user.otp = null;
     user.otp_expires_at = null;
 
-    if (!session.refresh_token || !session.refresh_token_expires_at?.isAfter(time())) {
+    if (!session.refresh_token || !session.refresh_token_expires_at?.isAfter(time().toDate())) {
       await session.rotateRefreshToken(manager);
     }
 
