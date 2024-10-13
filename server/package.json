@@ -19,14 +19,14 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "husky",
-    "typeorm": "ts-node -r tsconfig-paths/register --files ./node_modules/typeorm/cli.js",
+    "typeorm": "TS_NODE_PROJECT=tsconfig.json node -r ts-node/register -r tsconfig-paths/register ../node_modules/typeorm/cli.js",
     "migration:generate": "wrap () { yarn typeorm migration:generate -d src/library/typeorm/datasource.typeorm.ts src/databases/migrations/\"$*\" && npm run format | cat; }; wrap",
     "migration:run": "yarn typeorm -d src/library/typeorm/datasource.typeorm.ts migration:run",
     "migration:revert": "yarn typeorm -d src/library/typeorm/datasource.typeorm.ts migration:revert",
     "seed:generate": "wrap () { yarn typeorm migration:create src/databases/seeds/\"$*\" && npm run format | cat; }; wrap",
     "seed:run": "yarn typeorm -d src/library/typeorm/datasource-seed.typeorm.ts migration:run",
     "seed:revert": "yarn typeorm -d src/library/typeorm/datasource-seed.typeorm.ts migration:revert",
-    "erdia": "TS_NODE_PROJECT=tsconfig.json node -r ts-node/register -r tsconfig-paths/register ./node_modules/erdia/dist/cjs/cli.cjs",
+    "erdia": "TS_NODE_PROJECT=tsconfig.json node -r ts-node/register -r tsconfig-paths/register ../node_modules/erdia/dist/cjs/cli.cjs",
     "erd:build": "npx rimraf .erd && mkdir .erd && yarn erdia build"
   },
   "dependencies": {

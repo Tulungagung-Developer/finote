@@ -37,14 +37,16 @@ export function JsonColumn(options?: ColumnOptions): PropertyDecorator {
   return Column(deepmerge({ type: 'jsonb' }, options || {}));
 }
 
-export function AmmountColumn(options?: ColumnOptions): PropertyDecorator {
+export function AmountColumn(options?: ColumnOptions): PropertyDecorator {
   const columnOptions = deepmerge({ type: 'numeric', precision: 10, scale: 2 }, options || {});
   columnOptions.transformer = {
-    to(value) {
+    to(value?: any) {
+      if (!value) return null;
       return value;
     },
 
-    from(value) {
+    from(value?: any) {
+      if (!value) return 0;
       return Number(value);
     },
   };

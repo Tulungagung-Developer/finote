@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-bs-theme="dark">
   <head>
-    <title>finote-backend entity specification</title>
+    <title>finote-server entity specification</title>
     <meta charset="utf-8" />
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
@@ -170,7 +170,7 @@
   <body class="bg-body-tertiary">
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">finote-backend</a>
+        <a class="navbar-brand" href="/">finote-server</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -256,6 +256,37 @@ erDiagram
 
 
 
+"account(Account)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid user_id    FK    
+  *varchar type    
+  *varchar currency    
+  *varchar(100) name    
+  varchar(50) reference    
+  *numeric balance    
+  *numeric minimum_balance    
+  *int4 version    
+}
+
+
+"account(Account)"  }o  --  ||  "user(User)":  "user_id"
+
+"account_history(AccountHistory)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid account_id    FK    
+  *varchar action    
+  *varchar description    
+  *numeric pre_balance    
+  *numeric post_balance    
+}
+
+
+"account_history(AccountHistory)"  }o  --  ||  "account(Account)":  "account_id"
+
 "user_session(UserSession)" {
   *uuid id    PK    
   *timestamp created_at    
@@ -312,6 +343,37 @@ erDiagram
 }
 
 
+
+"account(Account)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid user_id    FK    
+  *varchar type    
+  *varchar currency    
+  *varchar(100) name    
+  varchar(50) reference    
+  *numeric balance    
+  *numeric minimum_balance    
+  *int4 version    
+}
+
+
+"account(Account)"  }o  --  ||  "user(User)":  "user_id"
+
+"account_history(AccountHistory)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid account_id    FK    
+  *varchar action    
+  *varchar description    
+  *numeric pre_balance    
+  *numeric post_balance    
+}
+
+
+"account_history(AccountHistory)"  }o  --  ||  "account(Account)":  "account_id"
 
 "user_session(UserSession)" {
   *uuid id    PK    

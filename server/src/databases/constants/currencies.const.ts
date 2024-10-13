@@ -8,17 +8,6 @@ interface ICurrencies {
   symbol: string;
 }
 
-const currencies = {
-  [Currencies.IDR]: {
-    locale: 'id-ID',
-    symbol: 'Rp',
-  },
-  [Currencies.USD]: {
-    locale: 'en-US',
-    symbol: '$',
-  },
-};
-
-export const getCurrency = (currency: Currencies): ICurrencies => {
-  return currencies[currency];
-};
+export const currencies = new Map<Currencies, ICurrencies>()
+  .set(Currencies.IDR, { locale: 'id-ID', symbol: 'Rp' })
+  .set(Currencies.USD, { locale: 'en-US', symbol: '$' });

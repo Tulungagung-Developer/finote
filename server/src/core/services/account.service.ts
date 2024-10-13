@@ -1,10 +1,10 @@
 import { AccountCreateReqDto, AccountUpdateReqDto } from '@core/dtos/account.dto';
 import { BasePaginatedResponseDto } from '@core/dtos/base.dto';
 import { RequestContext } from '@core/interceptors/request.interceptor';
-import { AccountHistory } from '@db/entities/core/account-history.entity';
+import { AccountHistory, AccountHistoryAction } from '@db/entities/core/account-history.entity';
 import { Account } from '@db/entities/core/account.entity';
 import { User } from '@db/entities/core/user.entity';
-import { DataConnenctor } from '@libs/typeorm/data-connector.typeorm';
+import { DataConnector } from '@libs/typeorm/data-connector.typeorm';
 import { DataSource } from '@libs/typeorm/datasource.typeorm';
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
@@ -16,7 +16,7 @@ export class AccountService {
   constructor() {}
 
   async getAccounts(ctx: RequestContext, user: User): Promise<BasePaginatedResponseDto<Account>> {
-    if (!ctx.paged) throw new BadRequestException('Paged is required');
+    if (!ctx.paged) throw new BadRequestException('Pagination context is required');
 
     const query = DataSource.createQueryBuilder(Account, Account.name);
     query.where(`${Account.name}.user_id = :user_id`, { user_id: user.id });
@@ -34,17 +34,41 @@ export class AccountService {
     return response;
   }
 
+  async getHistories(
+    ctx: RequestContext,
+    user: User,
+    account_id: string,
+  ): Promise<BasePaginatedResponseDto<AccountHistory>> {
+    if (!ctx.paged) throw new BadRequestException('Pagination context is required');
+
+    const query = DataSource.createQueryBuilder(AccountHistory, AccountHistory.name);
+    query.leftJoin(Account, 't2', `${AccountHistory.name}.account_id = t2.id`);
+    query.where('t2.user_id = :user_id', { user_id: user.id });
+    query.andWhere(`${AccountHistory.name}.account_id = :account_id`, { account_id });
+
+    const result = await AccountHistory.onQueryContext(query, AccountHistory.name, ctx);
+    const response = new BasePaginatedResponseDto<AccountHistory>();
+
+    response.items = result.items;
+    response.meta = {
+      page: ctx.paged.page,
+      page_size: ctx.paged.page_size,
+      total_data: result.totalData,
+    };
+
+    return response;
+  }
+
   async createAccount(dto: AccountCreateReqDto, user: User): Promise<Account> {
-    this.logger.log(dto);
-    return DataConnenctor(async (connector: EntityManager) => {
-      const isExist = await connector.getRepository(Account).exists({
+    return DataConnector(async (connector: EntityManager) => {
+      const existingAccount = await connector.getRepository(Account).findOne({
         where: [
           { user_id: user.id, name: dto.name },
           { user_id: user.id, reference: dto.reference },
         ],
       });
 
-      if (isExist) throw new BadRequestException('Account already exists');
+      if (existingAccount) throw new BadRequestException('Account already exists');
 
       const account = new Account();
       account.user_id = user.id;
@@ -57,11 +81,10 @@ export class AccountService {
 
       await connector.getRepository(Account).save(account, { reload: true });
 
-      this.logger.log(account);
-
       const log = new AccountHistory();
       log.account_id = account.id;
-      log.action = `Initially account: "${account.name}"${account.reference ? ` - ${account.reference}` : ''}`;
+      log.action = AccountHistoryAction.OTHER;
+      log.description = `Initially account: "${account.name}"${account.reference ? ` - ${account.reference}` : ''}`;
       log.pre_balance = 0;
       log.post_balance = account.balance;
 
@@ -72,7 +95,7 @@ export class AccountService {
   }
 
   async updateAccount(dto: AccountUpdateReqDto, user: User): Promise<Account> {
-    return DataConnenctor(async (connector: EntityManager) => {
+    return DataConnector(async (connector: EntityManager) => {
       const account = await connector.getRepository(Account).findOne({
         where: { user_id: user.id, id: dto.account_id },
       });
@@ -80,15 +103,20 @@ export class AccountService {
       if (!account) throw new NotFoundException();
       const pre_balance = account.balance;
 
-      account.name = dto.name || account.name;
-      account.reference = dto.reference || account.reference;
-      account.minimum_balance = dto.minimum_balance || account.minimum_balance;
+      if (Number(dto.minimum_balance) >= 0 && Number(dto.minimum_balance) > account.balance) {
+        throw new BadRequestException('Can not set minimum balance more than account balance');
+      }
+
+      account.name = !dto.name ? account.name : dto.name;
+      account.reference = !dto.reference ? account.reference : dto.reference;
+      account.minimum_balance = !dto.minimum_balance ? account.minimum_balance : dto.minimum_balance;
 
       await connector.getRepository(Account).save(account, { reload: true });
 
       const log = new AccountHistory();
       log.account_id = account.id;
-      log.action = `Update account detail`;
+      log.action = AccountHistoryAction.OTHER;
+      log.description = `Update account detail`;
       log.pre_balance = pre_balance;
       log.post_balance = account.balance;
 

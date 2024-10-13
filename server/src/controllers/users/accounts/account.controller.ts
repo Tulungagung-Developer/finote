@@ -23,7 +23,6 @@ export class AccountController extends AbstractController {
 
   @Post()
   async create(@Body() body: Record<string, any>, @Me() user: User) {
-    this.logger.log(body);
     const dto = await plainToInstance(AccountCreateReqDto, body);
     return this.accountService.createAccount(dto, user);
   }
@@ -32,5 +31,10 @@ export class AccountController extends AbstractController {
   async update(@Param() param: Record<string, any>, @Body() body: Record<string, any>, @Me() user: User) {
     const dto = await plainToInstance(AccountUpdateReqDto, { ...param, ...body });
     return this.accountService.updateAccount(dto, user);
+  }
+
+  @Get('/:account_id/histories')
+  async getHistories(@ReqContext() ctx: RequestContext, @Param() param: Record<string, any>, @Me() user: User) {
+    return this.accountService.getHistories(ctx, user, param.account_id);
   }
 }

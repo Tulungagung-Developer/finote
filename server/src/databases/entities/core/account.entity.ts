@@ -1,6 +1,6 @@
 import { CoreEntity } from '@db/entities/base/core';
 import BaseEntity from '@db/entities/base/base';
-import { AmmountColumn, ForeignColumn, StringColumn } from '@libs/typeorm/column-decorator.typeorm';
+import { AmountColumn, ForeignColumn, StringColumn } from '@libs/typeorm/column-decorator.typeorm';
 import { Index, ManyToOne, SelectQueryBuilder, VersionColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { User } from '@db/entities/core/user.entity';
@@ -30,16 +30,16 @@ export class Account extends BaseEntity {
   currency: Currencies;
 
   @Index()
-  @StringColumn({ nullable: false })
+  @StringColumn({ nullable: false, length: 100 })
   name: string;
 
-  @StringColumn({ nullable: true })
+  @StringColumn({ nullable: true, length: 50 })
   reference: string;
 
-  @AmmountColumn()
+  @AmountColumn()
   balance: number;
 
-  @AmmountColumn()
+  @AmountColumn()
   minimum_balance: number;
 
   @VersionColumn()
@@ -81,11 +81,17 @@ export class Account extends BaseEntity {
 
     if (startDate && !hasWhere) {
       query.where(`${mainAlias}.${Account.dateRange} >= :startDate`, { startDate: startDate });
-    } else if (startDate && hasWhere) {
+    }
+
+    if (startDate && hasWhere) {
       query.andWhere(`${mainAlias}.${Account.dateRange} >= :startDate`, { startDate: startDate });
-    } else if (endDate && !hasWhere) {
+    }
+
+    if (endDate && !hasWhere) {
       query.where(`${mainAlias}.${Account.dateRange} <= :endDate`, { endDate: endDate });
-    } else if (endDate && hasWhere) {
+    }
+
+    if (endDate && hasWhere) {
       query.andWhere(`${mainAlias}.${Account.dateRange} <= :endDate`, { endDate: endDate });
     }
   }
@@ -103,7 +109,7 @@ export class Account extends BaseEntity {
 
     if (context.paged) {
       query.limit(context.paged.page_size);
-      query.skip(context.paged.page_size * (context.paged.page - 1));
+      query.skip(context.paged.page_size * (Math.max(context.paged.page, 1) - 1));
     }
 
     const items = await query.getMany();

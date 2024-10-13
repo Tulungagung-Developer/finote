@@ -12,7 +12,7 @@ import { EntityManager, Index, ManyToOne, Not } from 'typeorm';
 import { Exclude, Type } from 'class-transformer';
 import { User } from '@db/entities/core/user.entity';
 import { time } from '@libs/helpers/time.helper';
-import { DataConnenctor } from '@libs/typeorm/data-connector.typeorm';
+import { DataConnector } from '@libs/typeorm/data-connector.typeorm';
 import { JwtService } from '@nestjs/jwt';
 
 export enum UserSessionValidity {
@@ -74,7 +74,7 @@ export class UserSession extends BaseEntity {
   last_login: time.Dayjs;
 
   async rotateRefreshToken(manager?: EntityManager) {
-    await DataConnenctor(async (em: EntityManager) => {
+    await DataConnector(async (em: EntityManager) => {
       this.refresh_token = `fnt_${crypto.randomBytes(32).toString('hex')}`;
       this.refresh_token_expires_at = time().add(30, 'days');
 

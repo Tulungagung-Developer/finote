@@ -18,11 +18,14 @@
     "server:dev": "yarn --cwd server start:dev",
     "server:migration-gen": "yarn --cwd server migration:generate",
     "server:migration-run": "yarn --cwd server migration:run",
-    "server:seed-run": "yarn --cwd server seed:run"
+    "server:migration-revert": "yarn --cwd server migration:revert",
+    "server:seed-run": "yarn --cwd server seed:run",
+    "server:erd": "yarn --cwd server erd:build"
   },
   "devDependencies": {
     "commitizen": "^4.3.1",
-    "cz-conventional-changelog": "^3.3.0"
+    "cz-conventional-changelog": "^3.3.0",
+    "erdia": "^3.7.0"
   },
   "config": {
     "commitizen": {
