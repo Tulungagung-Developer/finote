@@ -4,6 +4,7 @@ import { RequestContext } from '@core/interceptors/request.interceptor';
 import { AccountHistory, AccountHistoryAction } from '@db/entities/core/account-history.entity';
 import { Account } from '@db/entities/core/account.entity';
 import { User } from '@db/entities/core/user.entity';
+import { CreateResponseByContext } from '@libs/helpers/query-context.helper';
 import { DataConnector } from '@libs/typeorm/data-connector.typeorm';
 import { DataSource } from '@libs/typeorm/datasource.typeorm';
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
@@ -13,25 +14,15 @@ import { EntityManager } from 'typeorm';
 export class AccountService {
   private logger = new Logger(AccountService.name);
 
-  constructor() {}
-
   async getAccounts(ctx: RequestContext, user: User): Promise<BasePaginatedResponseDto<Account>> {
     if (!ctx.paged) throw new BadRequestException('Pagination context is required');
 
-    const query = DataSource.createQueryBuilder(Account, Account.name);
+    type TAccount = Account & { sortable: string[]; searchable: string[]; dateRange: string };
+
+    const query = DataSource.createQueryBuilder<TAccount>(Account, Account.name);
     query.where(`${Account.name}.user_id = :user_id`, { user_id: user.id });
 
-    const result = await Account.onQueryContext(query, Account.name, ctx);
-    const response = new BasePaginatedResponseDto<Account>();
-
-    response.items = result.items;
-    response.meta = {
-      page: ctx.paged.page,
-      page_size: ctx.paged.page_size,
-      total_data: result.totalData,
-    };
-
-    return response;
+    return CreateResponseByContext<TAccount>(ctx, query);
   }
 
   async getHistories(
@@ -46,17 +37,7 @@ export class AccountService {
     query.where('t2.user_id = :user_id', { user_id: user.id });
     query.andWhere(`${AccountHistory.name}.account_id = :account_id`, { account_id });
 
-    const result = await AccountHistory.onQueryContext(query, AccountHistory.name, ctx);
-    const response = new BasePaginatedResponseDto<AccountHistory>();
-
-    response.items = result.items;
-    response.meta = {
-      page: ctx.paged.page,
-      page_size: ctx.paged.page_size,
-      total_data: result.totalData,
-    };
-
-    return response;
+    return CreateResponseByContext<AccountHistory>(ctx, query);
   }
 
   async createAccount(dto: AccountCreateReqDto, user: User): Promise<Account> {
@@ -84,7 +65,7 @@ export class AccountService {
       const log = new AccountHistory();
       log.account_id = account.id;
       log.action = AccountHistoryAction.OTHER;
-      log.description = `Initially account: "${account.name}"${account.reference ? ` - ${account.reference}` : ''}`;
+      log.description = `Initially account: ${account.name}${account.reference ? ` - ${account.reference}` : ''}`;
       log.pre_balance = 0;
       log.post_balance = account.balance;
 
