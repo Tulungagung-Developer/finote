@@ -8,13 +8,11 @@ import { DecimalNumber } from '@libs/helpers/decimal.helper';
 import { CreateResponseByContext } from '@libs/helpers/query-context.helper';
 import { DataConnector } from '@libs/typeorm/data-connector.typeorm';
 import { DataSource } from '@libs/typeorm/datasource.typeorm';
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { EntityManager, Not } from 'typeorm';
 
 @Injectable()
 export class AccountService {
-  private logger = new Logger(AccountService.name);
-
   async getAccounts(ctx: RequestContext, user: User): Promise<BasePaginatedResponseDto<Account>> {
     if (!ctx.paged) throw new BadRequestException('Pagination context is required');
 
@@ -50,7 +48,11 @@ export class AccountService {
         ],
       });
 
-      if (existingAccount) throw new BadRequestException('Account already exists');
+      if (existingAccount) {
+        throw new BadRequestException(
+          `${existingAccount.name === dto.name ? 'An account with this name already exists' : 'An account with this reference alread exists'}`,
+        );
+      }
 
       const account = new Account();
       account.user_id = user.id;
@@ -83,17 +85,32 @@ export class AccountService {
       });
 
       if (!account) throw new NotFoundException();
-      const pre_balance = account.balance;
 
-      if (new DecimalNumber(dto.minimum_balance).gte(account.balance)) {
-        throw new BadRequestException('Can not set minimum balance more than account balance');
+      const existingAccount = await connector
+        .getRepository(Account)
+        .findOne({ where: [{ name: dto.name }, { reference: dto.reference }, { id: Not(account.id) }] });
+
+      if (existingAccount) {
+        throw new BadRequestException(
+          `${existingAccount.name === dto.name ? 'An account with this name already exists' : 'An account with this reference alread exists'}`,
+        );
       }
 
-      account.name = !dto.name ? account.name : dto.name;
-      account.reference = !dto.reference ? account.reference : dto.reference;
+      const pre_balance = account.balance;
+
+      account.name = dto.name ?? account.name;
+      account.reference = dto.reference ?? account.reference;
       account.minimum_balance = !dto.minimum_balance
         ? new DecimalNumber(account.minimum_balance)
         : new DecimalNumber(dto.minimum_balance);
+
+      if (account.minimum_balance.gte(account.balance)) {
+        throw new BadRequestException('Minimum balance cannot be greater than or equal to the current balance');
+      }
+
+      await connector
+        .getRepository(Account)
+        .findOne({ where: { id: account.id }, lock: { mode: 'optimistic', version: account.version++ } });
 
       await connector.getRepository(Account).save(account, { reload: true });
 
