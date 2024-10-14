@@ -6,10 +6,11 @@ import { Account } from '@db/entities/core/account.entity';
 import { User } from '@db/entities/core/user.entity';
 import { DecimalNumber } from '@libs/helpers/decimal.helper';
 import { CreateResponseByContext } from '@libs/helpers/query-context.helper';
+import { Retry } from '@libs/helpers/retry.helper';
 import { DataConnector } from '@libs/typeorm/data-connector.typeorm';
 import { DataSource } from '@libs/typeorm/datasource.typeorm';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { EntityManager, Not } from 'typeorm';
+import { EntityManager, Not, OptimisticLockVersionMismatchError } from 'typeorm';
 
 @Injectable()
 export class AccountService {
@@ -79,30 +80,30 @@ export class AccountService {
   }
 
   async updateAccount(dto: AccountUpdateReqDto, user: User): Promise<Account> {
-    return DataConnector(async (connector: EntityManager) => {
+    const fn = async (param: AccountUpdateReqDto, connector: EntityManager) => {
       const account = await connector.getRepository(Account).findOne({
-        where: { user_id: user.id, id: dto.account_id },
+        where: { user_id: user.id, id: param.account_id },
       });
 
       if (!account) throw new NotFoundException();
 
       const existingAccount = await connector
         .getRepository(Account)
-        .findOne({ where: [{ name: dto.name }, { reference: dto.reference }, { id: Not(account.id) }] });
+        .findOne({ where: [{ name: param.name }, { reference: param.reference }, { id: Not(account.id) }] });
 
       if (existingAccount) {
         throw new BadRequestException(
-          `${existingAccount.name === dto.name ? 'An account with this name already exists' : 'An account with this reference alread exists'}`,
+          `${existingAccount.name === param.name ? 'An account with this name already exists' : 'An account with this reference alread exists'}`,
         );
       }
 
       const pre_balance = account.balance;
 
-      account.name = dto.name ?? account.name;
-      account.reference = dto.reference ?? account.reference;
-      account.minimum_balance = !dto.minimum_balance
+      account.name = param.name ?? account.name;
+      account.reference = param.reference ?? account.reference;
+      account.minimum_balance = !param.minimum_balance
         ? new DecimalNumber(account.minimum_balance)
-        : new DecimalNumber(dto.minimum_balance);
+        : new DecimalNumber(param.minimum_balance);
 
       if (account.minimum_balance.gte(account.balance)) {
         throw new BadRequestException('Minimum balance cannot be greater than or equal to the current balance');
@@ -124,6 +125,11 @@ export class AccountService {
       await connector.getRepository(AccountHistory).save(log);
 
       return account;
-    });
+    };
+
+    return Retry.create<AccountUpdateReqDto, Account>(async (param) => DataConnector(async (dc) => fn(param, dc)))
+      .configure({ maxAttempts: Infinity, delay: 2000 })
+      .catch(OptimisticLockVersionMismatchError)
+      .execute(dto);
   }
 }

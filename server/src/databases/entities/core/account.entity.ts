@@ -48,6 +48,7 @@ export class Account extends BaseEntity {
   @AmountColumn()
   minimum_balance: DecimalNumber;
 
+  @Exclude()
   @VersionColumn()
   version: number;
 }
