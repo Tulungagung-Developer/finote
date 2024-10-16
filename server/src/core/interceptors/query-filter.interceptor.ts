@@ -12,6 +12,8 @@ import { Observable } from 'rxjs';
 import { Transform } from 'class-transformer';
 import { plainToInstance } from '@libs/class-transformer/from-plain.transformer';
 
+export type TSortQueryFilter = { property: string; type: 'ASC' | 'DESC' };
+
 @ValidatorConstraint({ name: 'isSortUnique', async: false })
 class IsSortUnique implements ValidatorConstraintInterface {
   validate(value: { property: string; type: 'asc' | 'desc' }[]): boolean {
@@ -33,12 +35,12 @@ export class QueryFilter {
       ? value
           .split(',')
           .map((v: string) =>
-            v.startsWith('-') ? { property: v.slice(1), type: 'desc' } : { property: v, type: 'asc' },
+            v.startsWith('-') ? { property: v.slice(1), type: 'DESC' } : { property: v, type: 'ASC' },
           )
       : undefined,
   )
   @Validate(IsSortUnique)
-  sort: { property: string; type: 'asc' | 'desc' }[];
+  sort: TSortQueryFilter[];
 
   @IsOptional()
   @IsDate()

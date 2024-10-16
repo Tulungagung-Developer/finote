@@ -2,6 +2,7 @@ import { MakeEnv } from '@conf/env.config';
 import { MakeSentry } from '@conf/sentry.config';
 
 MakeEnv.initialize({
+  pathEnv: '../.env',
   ensureKeys: [
     'SERVER_PORT',
     'DEBUG',

@@ -21,7 +21,7 @@ We use PostgreSQL, a powerful open-source relational database management system 
 
 ## Requirements
 
-Before you can run the Finote Backend, make sure you have the following prerequisites installed on your system:
+Before you can run the Finote, make sure you have the following prerequisites installed on your system:
 
 1. Node.js (version 20.15.1 or higher) (this project includes the asdf version manager)
 2. Yarn (version 1.22.19 or higher)
@@ -101,7 +101,7 @@ After the clone, please follow the instructions I've included below.
 
 ## Contribute
 
-If you'd like to contribute to the Finote Backend, please follow these guidelines:
+If you'd like to contribute to the Finote, please follow these guidelines:
 
 1. Fork the repository. (please read: [About Fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks))
 2. Better to use [git sparse-checkout](https://git-scm.com/docs/sparse-checkout) for minimize your project data.

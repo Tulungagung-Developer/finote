@@ -18,7 +18,7 @@ import { FastifyReply } from 'fastify';
 import { Me } from '@core/decorators/me.decorator';
 import { User } from '@db/entities/core/user.entity';
 import { time } from '@libs/helpers/time.helper';
-import { DataConnenctor } from '@libs/typeorm/data-connector.typeorm';
+import { DataConnector } from '@libs/typeorm/data-connector.typeorm';
 import { plainToInstance } from '@libs/class-transformer/from-plain.transformer';
 import { FasitfyCookieSigner } from '@conf/fastify.config';
 
@@ -44,7 +44,7 @@ export class AuthController extends AbstractController {
 
     const dto = await plainToInstance(UserLoginReqDto, payload);
 
-    const userSession = await DataConnenctor(async (connector) => {
+    const userSession = await DataConnector(async (connector) => {
       const user = await this.service.attempt(dto, connector);
       return this.service.createSession(user, dto, connector);
     });
@@ -70,7 +70,7 @@ export class AuthController extends AbstractController {
 
   @Get('verify')
   async verifySession(@Query() query: UserSessionVerifyReqDto) {
-    await DataConnenctor(async (connector) => this.service.verifySession(query, connector));
+    await DataConnector(async (connector) => this.service.verifySession(query, connector));
   }
 
   @Get('refresh')
@@ -81,6 +81,6 @@ export class AuthController extends AbstractController {
     const unsign = FasitfyCookieSigner.unsign(refresh_token);
     if (!unsign.valid) throw new UnauthorizedException();
 
-    return await DataConnenctor(async (connector) => this.service.refreshSession(unsign.value, connector));
+    return await DataConnector(async (connector) => this.service.refreshSession(unsign.value, connector));
   }
 }

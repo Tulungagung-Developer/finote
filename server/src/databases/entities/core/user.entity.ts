@@ -4,7 +4,7 @@ import { EntityManager, Index, Not } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { DateTimeColumn, StringColumn } from '@libs/typeorm/column-decorator.typeorm';
 import { time } from '@libs/helpers/time.helper';
-import { DataConnenctor } from '@libs/typeorm/data-connector.typeorm';
+import { DataConnector } from '@libs/typeorm/data-connector.typeorm';
 
 export enum TypeUserOTP {
   SESSION_VERIFICATION = 'session_verification',
@@ -37,7 +37,7 @@ export class User extends BaseEntity {
   otp_expires_at: time.Dayjs | null;
 
   async generateOTP(type: TypeUserOTP, manager?: EntityManager) {
-    await DataConnenctor(async (em: EntityManager) => {
+    await DataConnector(async (em: EntityManager) => {
       if (this.otp && this.otp_type === type && this.otp_expires_at?.isAfter(time())) return;
 
       this.otp = Math.floor(100000 + Math.random() * 900000).toString();

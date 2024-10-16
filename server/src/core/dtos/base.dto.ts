@@ -6,7 +6,6 @@ export class ErrorResponseDto {
 
 export class MetaDto {
   total_data: number;
-  total_page: number;
   page_size: number;
   page: number;
 }
