@@ -242,6 +242,30 @@
 
 erDiagram
 
+"note(Note)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *varchar name    
+  varchar(100) description    
+}
+
+
+
+"note_transaction(NoteTransaction)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid note_id    FK    
+  *varchar(100) description    
+  *numeric total    
+  *numeric pre_balance    
+  *numeric post_balance    
+}
+
+
+"note_transaction(NoteTransaction)"  }o  --  ||  "note(Note)":  "note_id"
+
 "user(User)" {
   *uuid id    PK    
   *timestamp created_at    
@@ -273,19 +297,22 @@ erDiagram
 
 "account(Account)"  }o  --  ||  "user(User)":  "user_id"
 
-"account_history(AccountHistory)" {
+"note_item(NoteItem)" {
   *uuid id    PK    
   *timestamp created_at    
   *timestamp updated_at    
+  *uuid transaction_id    FK    
   *uuid account_id    FK    
-  *varchar action    
-  *varchar description    
-  *numeric pre_balance    
-  *numeric post_balance    
+  *uuid user_id    FK    
+  *varchar(100) name    
+  *numeric amount    
+  *smallint is_over_budget    
 }
 
 
-"account_history(AccountHistory)"  }o  --  ||  "account(Account)":  "account_id"
+"note_item(NoteItem)"  }o  --  ||  "note_transaction(NoteTransaction)":  "transaction_id"
+"note_item(NoteItem)"  }o  --  ||  "account(Account)":  "account_id"
+"note_item(NoteItem)"  }o  --  ||  "user(User)":  "user_id"
 
 "user_session(UserSession)" {
   *uuid id    PK    
@@ -306,6 +333,44 @@ erDiagram
 
 
 "user_session(UserSession)"  }o  --  ||  "user(User)":  "user_id"
+
+"account_history(AccountHistory)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid account_id    FK    
+  *varchar action    
+  *varchar description    
+  *numeric pre_balance    
+  *numeric post_balance    
+}
+
+
+"account_history(AccountHistory)"  }o  --  ||  "account(Account)":  "account_id"
+
+"note_account(NoteAccount)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid note_id    FK    
+  *uuid account_id    FK    
+}
+
+
+"note_account(NoteAccount)"  }o  --  ||  "note(Note)":  "note_id"
+"note_account(NoteAccount)"  }o  --  ||  "account(Account)":  "account_id"
+
+"note_member(NoteMember)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid note_id    FK    
+  *uuid user_id    FK    
+}
+
+
+"note_member(NoteMember)"  }o  --  ||  "note(Note)":  "note_id"
+"note_member(NoteMember)"  }o  --  ||  "user(User)":  "user_id"
 
                 </pre
           >
@@ -330,6 +395,30 @@ erDiagram
 
 erDiagram
 
+"note(Note)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *varchar name    
+  varchar(100) description    
+}
+
+
+
+"note_transaction(NoteTransaction)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid note_id    FK    
+  *varchar(100) description    
+  *numeric total    
+  *numeric pre_balance    
+  *numeric post_balance    
+}
+
+
+"note_transaction(NoteTransaction)"  }o  --  ||  "note(Note)":  "note_id"
+
 "user(User)" {
   *uuid id    PK    
   *timestamp created_at    
@@ -361,19 +450,22 @@ erDiagram
 
 "account(Account)"  }o  --  ||  "user(User)":  "user_id"
 
-"account_history(AccountHistory)" {
+"note_item(NoteItem)" {
   *uuid id    PK    
   *timestamp created_at    
   *timestamp updated_at    
+  *uuid transaction_id    FK    
   *uuid account_id    FK    
-  *varchar action    
-  *varchar description    
-  *numeric pre_balance    
-  *numeric post_balance    
+  *uuid user_id    FK    
+  *varchar(100) name    
+  *numeric amount    
+  *smallint is_over_budget    
 }
 
 
-"account_history(AccountHistory)"  }o  --  ||  "account(Account)":  "account_id"
+"note_item(NoteItem)"  }o  --  ||  "note_transaction(NoteTransaction)":  "transaction_id"
+"note_item(NoteItem)"  }o  --  ||  "account(Account)":  "account_id"
+"note_item(NoteItem)"  }o  --  ||  "user(User)":  "user_id"
 
 "user_session(UserSession)" {
   *uuid id    PK    
@@ -394,6 +486,44 @@ erDiagram
 
 
 "user_session(UserSession)"  }o  --  ||  "user(User)":  "user_id"
+
+"account_history(AccountHistory)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid account_id    FK    
+  *varchar action    
+  *varchar description    
+  *numeric pre_balance    
+  *numeric post_balance    
+}
+
+
+"account_history(AccountHistory)"  }o  --  ||  "account(Account)":  "account_id"
+
+"note_account(NoteAccount)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid note_id    FK    
+  *uuid account_id    FK    
+}
+
+
+"note_account(NoteAccount)"  }o  --  ||  "note(Note)":  "note_id"
+"note_account(NoteAccount)"  }o  --  ||  "account(Account)":  "account_id"
+
+"note_member(NoteMember)" {
+  *uuid id    PK    
+  *timestamp created_at    
+  *timestamp updated_at    
+  *uuid note_id    FK    
+  *uuid user_id    FK    
+}
+
+
+"note_member(NoteMember)"  }o  --  ||  "note(Note)":  "note_id"
+"note_member(NoteMember)"  }o  --  ||  "user(User)":  "user_id"
 
 </textarea
         >
