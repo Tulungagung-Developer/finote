@@ -29,7 +29,7 @@ can't wait to see what you contribute! 🎉
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the
-[Code of Conduct](blob/master/CODE_OF_CONDUCT.md).
+[Code of Conduct](/CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior
 to <ivanazis.id@gmail.com>.
 
@@ -38,12 +38,13 @@ to <ivanazis.id@gmail.com>.
 > If you want to ask a question, we assume that you have read the available [Documentation](/README.md).
 
 We've made it easy for you to find the answers you're looking for! Before you ask a question, simply search for existing
-[Issues](/issues) that might help you. If you've found a suitable issue and still need clarification, you can write your
+[Issues](https://github.com/Tulungagung-Developer/finote/issues) that might help you. If you've found a suitable issue
+and still need clarification, you can write your
 question in this issue. And don't forget to search the internet for answers first!
 
 If you then still feel the need to ask a question and need clarification, we recommend the following:
 
-- Open an [Issue](/issues/new).
+- Open an [Issue](https://github.com/Tulungagung-Developer/finote/issues/new).
 - Provide as much context as you can about what you're running into.
 - Provide project and platform versions (nodejs, npm, etc), depending on what seems relevant.
 
@@ -85,7 +86,8 @@ possible!
 
 We use GitHub issues to track bugs and errors. If you run into an issue with the project:
 
-- Please create a new issue by clicking on the [Issue](/issues/new). As we are not yet certain whether this is a bug, we
+- Please create a new issue by clicking on the [Issue](https://github.com/Tulungagung-Developer/finote/issues/new). As
+  we are not yet certain whether this is a bug, we
   kindly request that you refrain from discussing it and from labeling the issue.
 - Please describe the expected behavior and the actual behavior.
 - Please provide as much context as possible and describe the steps that someone else can follow to recreate the issue
@@ -112,7 +114,8 @@ understand your suggestion and find related suggestions.
 - Just a heads-up: Make sure you're using the latest version.
 - Take a look at the documentation [README](/README.md) and see if the functionality is already covered, maybe by an
   individual configuration.
-- Check if the enhancement has already been suggested by doing a search [Issues](/issues). If it's already been
+- Check if the enhancement has already been suggested by doing a
+  search [Issues](https://github.com/Tulungagung-Developer/finote/issues). If it's already been
   suggested, just add a comment to the existing issue instead of opening a new one.
 - Make sure your idea fits with the project's scope and aims. It's up to you to make a strong case to convince the
   developers of the feature's merits. Keep in mind that we want features that will be useful to most of our users, not
@@ -120,7 +123,7 @@ understand your suggestion and find related suggestions.
 
 #### How Do I Submit a Good Enhancement Suggestion?
 
-Enhancement suggestions are tracked as [GitHub issues](/issues).
+Enhancement suggestions are tracked as [GitHub issues](https://github.com/Tulungagung-Developer/finote/issues).
 
 - Use a **clear and descriptive title** for the issue to identify the suggestion.
 - Provide a **step-by-step description of the suggested enhancement** in as many details as possible.

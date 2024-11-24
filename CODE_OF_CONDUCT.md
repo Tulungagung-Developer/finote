@@ -23,13 +23,14 @@ The following behaviors contribute to a positive environment for our community:
 - The use of sexualized language or imagery, and sexual attention or advances of any kind
 - Trolling, insulting or derogatory comments, and personal or political attacks
 - Public or private harassment
-- Publishing others' private information, such as a physical or email address, without their explicit permission
-  Permission:
-  Other conduct which could reasonably be considered inappropriate in a professional setting
-  Enforcement Responsibilities:
-  Community leaders are responsible for clarifying and enforcing our standards of acceptable behavior. They will take
-  appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening,
-  offensive, or harmful.
+- Publishing others' private information, such as a physical or email address, without their explicit permission.
+  > Permission:
+  > Other conduct which could reasonably be considered inappropriate in a professional setting
+
+  > Enforcement Responsibilities:
+  > Community leaders are responsible for clarifying and enforcing our standards of acceptable behavior. They will take
+  > appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening,
+  > offensive, or harmful.
 
 Community leaders have the right and responsibility to remove, edit, or reject any comments, commits, code, wiki edits,
 issues, or other contributions that are not aligned with this Code of Conduct. They will communicate reasons for
@@ -42,7 +43,7 @@ account, or act as an appointed representative at an online or offline event.
 ## Enforcement
 
 If you witness or experience any form of abusive, harassing, or unacceptable behavior, you are encouraged to report it
-to the community leaders responsible for enforcement at [INSERT CONTACT METHOD].
+to the community leaders responsible for enforcement at <ivanazis.id@gmail.com>.
 All complaints will be reviewed and investigated promptly and fairly.
 
 Community leaders must respect the privacy and security of the reporter of any incident.
@@ -55,8 +56,7 @@ Community leaders must follow these guidelines when determining consequences for
 ### 1. Correction
 
 **Community Impact**: Use of inappropriate language or other unprofessional or unwelcome behavior in the community will
-not
-be tolerated.
+not be tolerated.
 
 **The consequence will be**: Community leaders will issue a written warning to the offending party, clearly defining the
 nature of the violation and explaining why the behavior was inappropriate. A public apology will be requested.
@@ -78,10 +78,9 @@ social media. If you violate these terms, you will face a temporary or permanent
 result in immediate and permanent banning from the community.
 
 **The consequence is as follows**: You will be temporarily banned from any form of interaction or public communication
-with
-the community for a specified period of time. During this period, you are not permitted to interact with anyone involved
-in this process, including those enforcing the Code of Conduct. This includes any unsolicited interaction.
-If you violate these terms, you will be permanently banned.
+with the community for a specified period of time. During this period, you are not permitted to interact with anyone
+involved in this process, including those enforcing the Code of Conduct. This includes any unsolicited interaction. If
+you violate these terms, you will be permanently banned.
 
 If you engage in any of the following activities, you will be permanently banned from the community: A permanent ban
 will result in the following community impact: If you demonstrate a pattern of violating community standards, including
