@@ -1,0 +1,106 @@
+name: Verify Latest Commit Signature
+
+on:
+  pull_request:
+    branches: [ develop, master ]
+  push:
+    branches: [ develop, master ]
+
+jobs:
+  verify-latest-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # Only fetch the latest commit
+
+      - name: Install GPG
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg
+
+      - name: Import and Trust GPG Key
+        run: |
+          # Create a directory for GPG operations
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          
+          # Configure GPG
+          echo "use-agent" > ~/.gnupg/gpg.conf
+          echo "no-tty" >> ~/.gnupg/gpg.conf
+          
+          # Import public key from GitHub
+          curl -s https://github.com/${{ github.actor }}.gpg | gpg --import --quiet
+          
+          # List keys to confirm import
+          gpg --list-keys
+          
+          # Explicitly trust the imported GPG key
+          KEY_ID=$(gpg --list-keys --with-colons | grep '^pub' | cut -d':' -f5)
+          echo "$KEY_ID:6:" | gpg --import-ownertrust
+
+      - name: Debug GPG Setup
+        if: failure()
+        run: |
+          echo "GPG directory contents:"
+          ls -la ~/.gnupg
+          echo "GPG config:"
+          cat ~/.gnupg/gpg.conf
+
+      - name: Verify Latest Commit
+        shell: bash
+        run: |
+          # Get the latest commit hash
+          LATEST_COMMIT=$(git rev-parse HEAD)
+          
+          echo "Verifying signature for commit: $LATEST_COMMIT"
+          
+          # Show commit details
+          git log -1 --show-signature
+          echo -e "\n-----------------------------------"
+          
+          # Check signature status
+          SIGNATURE_STATUS=$(git log --format='%G?' -n 1 "$LATEST_COMMIT")
+          
+          case "$SIGNATURE_STATUS" in
+            "G")
+              echo "✅ Good signature from valid key"
+              exit 0
+              ;;
+            "U")
+              echo "❌ Good signature from UNKNOWN key"
+              echo "::error::Commit is signed with an unknown key. Please add your GPG key to GitHub"
+              exit 1
+              ;;
+            "B")
+              echo "❌ BAD signature"
+              echo "::error::Commit has an invalid signature"
+              exit 1
+              ;;
+            "N")
+              echo "❌ NO signature"
+              echo "::error::Commit is not signed. Please sign your commits using GPG"
+              exit 1
+              ;;
+            "E")
+              echo "❌ Signature verification ERROR"
+              echo "::error::Error occurred during signature verification"
+              exit 1
+              ;;
+            "Y")
+              echo "❌ Good signature from expired key"
+              echo "::error::Commit is signed with an expired key. Please update your GPG key"
+              exit 1
+              ;;
+            "R")
+              echo "❌ Good signature from revoked key"
+              echo "::error::Commit is signed with a revoked key. Please generate and use a new GPG key"
+              exit 1
+              ;;
+            *)
+              echo "❌ Unknown verification status: $SIGNATURE_STATUS"
+              echo "::error::Unknown signature verification status"
+              exit 1
+              ;;
+          esac
