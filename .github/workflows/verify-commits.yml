@@ -1,0 +1,78 @@
+name: Verify Commit Signatures
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  verify-commit-signature:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Import GPG key
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get author email and name
+          AUTHOR_EMAIL=$(git log -1 --pretty='format:%ae')
+          AUTHOR_NAME=$(git log -1 --pretty='format:%an')
+          
+          # Debugging: print author information
+          echo "Author Email: $AUTHOR_EMAIL"
+          echo "Author Name: $AUTHOR_NAME"
+          
+          # Create GPG configuration directory
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          
+          # Configure GPG to use SHA256
+          echo "personal-digest-preferences SHA256" > ~/.gnupg/gpg.conf
+          echo "default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed" >> ~/.gnupg/gpg.conf
+          
+          # Try multiple methods to fetch the GPG key
+          echo "Attempting to fetch GPG key..."
+          
+          # Method 1: Fetch from GitHub user's GPG key page
+          GPG_KEY_URL="https://github.com/${{ github.actor }}.gpg"
+          echo "Trying to fetch key from: $GPG_KEY_URL"
+          curl -s "$GPG_KEY_URL" | gpg --import - || true
+          
+          # Method 2: Fetch from GitHub API
+          gh api users/${{ github.actor }}/gpg_keys | jq -r '.[] .raw_key' | gpg --import - || true
+          
+          # List imported keys for debugging
+          gpg --list-keys
+
+      - name: Verify latest commit signature
+        run: |
+          # Get the latest commit hash
+          LATEST_COMMIT=$(git rev-parse HEAD)
+          
+          # Print commit details for debugging
+          echo "Latest Commit: $LATEST_COMMIT"
+          
+          # Check signature status
+          SIGNATURE_STATUS=$(git log --format='%G?' -n 1 "$LATEST_COMMIT")
+          echo "Signature Status: $SIGNATURE_STATUS"
+          
+          # Display signature details
+          git log --show-signature -1
+          
+          # Check if the status is valid (G: Good signature, U: Valid signature)
+          if [[ "$SIGNATURE_STATUS" == "G" || "$SIGNATURE_STATUS" == "U" ]]; then
+            echo "Commit signature is valid."
+          else
+            echo "Commit signature is invalid or missing."
+            exit 1
+          fi
