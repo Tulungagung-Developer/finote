@@ -24,57 +24,54 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get author email and name
+          # Get signing key details
+          SIGNING_KEY_ID=$(git log -1 --pretty='format:%GK')
           AUTHOR_EMAIL=$(git log -1 --pretty='format:%ae')
-          AUTHOR_NAME=$(git log -1 --pretty='format:%an')
           
           # Create GPG configuration directory
           mkdir -p ~/.gnupg
           chmod 700 ~/.gnupg
           
-          # Updated GPG Configuration for Compatibility and Security
+          # Updated GPG Configuration
           cat > ~/.gnupg/gpg.conf << EOL
-          # Digest Preferences
           personal-digest-preferences SHA256
           cert-digest-algo SHA256
           default-preference-list SHA256 SHA384 SHA512 AES256 AES192 AES
-          
-          # Keyserver and Trust
           keyserver hkps://keys.openpgp.org
           no-autostart
           use-agent
-          
-          # Security Enhancements
           require-cross-certification
           EOL
           
-          # Configure GPG agent
-          mkdir -p ~/.gnupg/private-keys-v1.d
-          chmod 700 ~/.gnupg/private-keys-v1.d
-          
-          # Debugging: Print configuration
-          echo "GPG Configuration:"
-          cat ~/.gnupg/gpg.conf
+          # Debugging: print configuration
+          echo "Signing Key ID: $SIGNING_KEY_ID"
+          echo "Author Email: $AUTHOR_EMAIL"
           
           # Try multiple methods to fetch the GPG key
           echo "Attempting to fetch GPG key..."
           
-          # Method 1: Fetch from GitHub user's GPG key page
+          # Method 1: GitHub API key fetch
+          GITHUB_KEYS=$(gh api users/${{ github.actor }}/gpg_keys | jq -r '.[] .raw_key')
+          if [ -n "$GITHUB_KEYS" ]; then
+            echo "Importing keys from GitHub API"
+            echo "$GITHUB_KEYS" | gpg --import
+          fi
+          
+          # Method 2: Fetch from GitHub user's GPG key page
           GPG_KEY_URL="https://github.com/${{ github.actor }}.gpg"
           echo "Trying to fetch key from: $GPG_KEY_URL"
           curl -s "$GPG_KEY_URL" | gpg --import - || true
           
-          # Method 2: Fetch from GitHub API
-          gh api users/${{ github.actor }}/gpg_keys | jq -r '.[] .raw_key' | gpg --import - || true
+          # Method 3: Try keyservers
+          gpg --keyserver hkps://keys.openpgp.org --recv-keys "$SIGNING_KEY_ID" || true
+          gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys "$SIGNING_KEY_ID" || true
           
-          # List imported keys with detailed information
+          # List imported keys for debugging
           echo -e "\nImported GPG Keys:"
           gpg --list-keys --keyid-format LONG
-          gpg --list-signatures
           
-          # Verify key information
-          echo -e "\nKey Details:"
-          gpg --list-keys "$AUTHOR_EMAIL" || true
+          # Show verbose key information
+          gpg --list-signatures
 
       - name: Comprehensive Signature Verification
         run: |
