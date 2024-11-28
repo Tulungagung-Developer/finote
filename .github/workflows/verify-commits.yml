@@ -20,6 +20,22 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Get Commit Details
+        run: |
+          # Get full commit details
+          git log -1 --pretty=fuller
+          
+          # Get commit email and name
+          AUTHOR_EMAIL=$(git log -1 --pretty='format:%ae')
+          AUTHOR_NAME=$(git log -1 --pretty='format:%an')
+          COMMITTER_EMAIL=$(git log -1 --pretty='format:%ce')
+          COMMITTER_NAME=$(git log -1 --pretty='format:%cn')
+          
+          echo "Author Email: $AUTHOR_EMAIL"
+          echo "Author Name: $AUTHOR_NAME"
+          echo "Committer Email: $COMMITTER_EMAIL"
+          echo "Committer Name: $COMMITTER_NAME"
+
       - name: Import GPG key
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
