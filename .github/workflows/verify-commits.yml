@@ -1,0 +1,75 @@
+name: Verify Commit Signatures
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  verify-commit-signature:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Import GPG key
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get signing key details
+          SIGNING_KEY_ID=$(git log -1 --pretty='format:%GK')
+          AUTHOR_EMAIL=$(git log -1 --pretty='format:%ae')
+          
+          # Create GPG configuration directory
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          
+          # Updated GPG Configuration
+          cat > ~/.gnupg/gpg.conf << EOL
+          personal-digest-preferences SHA256
+          cert-digest-algo SHA256
+          default-preference-list SHA256 SHA384 SHA512 AES256 AES192 AES
+          keyserver hkps://keys.openpgp.org
+          no-autostart
+          use-agent
+          require-cross-certification
+          EOL
+          
+          # Try multiple methods to fetch the GPG key
+          echo "Attempting to fetch GPG key..."
+          
+          # Method 1: GitHub API key fetch
+          GITHUB_KEYS=$(gh api users/${{ github.actor }}/gpg_keys | jq -r '.[] .raw_key')
+          
+          # Method 2: Fetch from GitHub user's GPG key page
+          GPG_KEY_URL="https://github.com/${{ github.actor }}.gpg"
+          curl -s "$GPG_KEY_URL" | gpg --import - || true
+          
+          # Method 3: Try keyservers
+          gpg --keyserver hkps://keys.openpgp.org --recv-keys "$SIGNING_KEY_ID" || true
+          gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys "$SIGNING_KEY_ID" || true
+
+      - name: Comprehensive Signature Verification
+        run: |
+          # Get the latest commit hash
+          LATEST_COMMIT=$(git rev-parse HEAD)
+          
+          # Multiple signature status checks
+          echo -e "\n--- Signature Status Checks ---"
+          SIGNATURE_STATUS=$(git log --format='%G?' -n 1 "$LATEST_COMMIT")
+          
+          # Comprehensive status check
+          if [ "$SIGNATURE_STATUS" == "G" ] || [ "$SIGNATURE_STATUS" == "U" ]; then
+            echo "✅ Signature is good and verified."
+          else
+            echo "❌ Bad signature detected."
+            exit 1
+          fi
